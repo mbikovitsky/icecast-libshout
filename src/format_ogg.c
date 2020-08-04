@@ -92,6 +92,8 @@ static int send_ogg(shout_t *self, const unsigned char *data, size_t len)
     ogg_page     page;
 
     buffer = ogg_sync_buffer(&ogg_data->oy, len);
+    if (!buffer)
+        return self->error = SHOUTERR_INSANE;
     memcpy(buffer, data, len);
     ogg_sync_wrote(&ogg_data->oy, len);
 
