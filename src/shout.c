@@ -198,8 +198,12 @@ int shout_close(shout_t *self)
     if (!self->connection)
         return self->error = SHOUTERR_UNCONNECTED;
 
-    if (self->connection && self->connection->current_message_state == SHOUT_MSGSTATE_SENDING1 && self->close)
+    if (self->connection && self->connection->current_message_state == SHOUT_MSGSTATE_SENDING1 && self->close) {
         self->close(self);
+        self->format_data = NULL;
+        self->send = NULL;
+        self->close = NULL;
+    }
 
     shout_connection_unref(self->connection);
     self->connection = NULL;
