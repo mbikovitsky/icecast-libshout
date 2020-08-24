@@ -621,6 +621,9 @@ ssize_t             shout_connection_send(shout_connection_t *con, shout_t *shou
     if (con->current_message_state != SHOUT_MSGSTATE_SENDING1)
         return -1;
 
+    if (con->error == SHOUTERR_SOCKET)
+        return -1;
+
     ret = shout_queue_data(&(con->wqueue), buf, len);
     if (ret != SHOUTERR_SUCCESS) {
         shout_connection_set_error(con, ret);
