@@ -1,3 +1,12 @@
+libshout 2.4.3 (2020????)
+
+* Fixed handling of blocking/non-blocking mode
+* Fixed ICY port increment
+* Fixed reusing of handles
+* Fixed error handling of Ogg sync layer
+* Fixed Passing of errors between connection and instance layer
+  Without this fix died connections were not correctly detected.
+
 libshout 2.4.3 (20190529)
 * Fixed building with OpenSSL 1.1.0.
 * Fixed static building with OpenSSL.
