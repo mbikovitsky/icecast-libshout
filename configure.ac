@@ -94,7 +94,7 @@ AC_SEARCH_LIBS([nanosleep], [rt],
 
 dnl Allow examples not to be build
 AC_ARG_ENABLE([examples],
-  AC_HELP_STRING([--disable-examples],[Do not build example code]))
+  AS_HELP_STRING([--disable-examples],[Do not build example code]))
 AM_CONDITIONAL([HAVE_EXAMPLES],[test "${enable_examples}" != "no"])
 
 dnl Module checks
@@ -102,7 +102,7 @@ XIPH_NET
 
 dnl Extra dependencies
 AC_ARG_ENABLE([thread],
-  AC_HELP_STRING([--disable-thread],[do not build with thread support even if it is available]))
+  AS_HELP_STRING([--disable-thread],[do not build with thread support even if it is available]))
 
 SHOUT_THREADSAFE="0"
 if test "$enable_thread" != "no"
@@ -133,7 +133,7 @@ VORBIS_LIBS="$VORBIS_LDFLAGS $VORBIS_LIBS"
 XIPH_CFLAGS="$XIPH_CFLAGS $VORBIS_CFLAGS"
 
 AC_ARG_ENABLE([theora],
-  AC_HELP_STRING([--disable-theora],[do not build with Theora support]))
+  AS_HELP_STRING([--disable-theora],[do not build with Theora support]))
 
 if test "x$enable_theora" != "xno"; then
 PKG_CHECK_MODULES(THEORA, theora, [
@@ -152,7 +152,7 @@ then
 fi
 
 AC_ARG_ENABLE([speex],
-  AC_HELP_STRING([--disable-speex],[do not build with Speex support]))
+  AS_HELP_STRING([--disable-speex],[do not build with Speex support]))
 
 if test "x$enable_speex" != "xno"; then
 PKG_CHECK_MODULES(SPEEX, speex, [
@@ -173,7 +173,7 @@ fi
 dnl If pkgconfig is found, install a shout.pc file.
 
 AC_ARG_ENABLE([pkgconfig],
-  AC_HELP_STRING([--disable-pkgconfig],[disable pkgconfig data files (auto)]),
+  AS_HELP_STRING([--disable-pkgconfig],[disable pkgconfig data files (auto)]),
   [dopkgconfig="$enableval"], [dopkgconfig="maybe"])
 if test "$dopkgconfig" = "maybe"
 then
