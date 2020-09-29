@@ -42,7 +42,10 @@ dnl Set some options based on environment
 dnl openbsd headers break when _XOPEN_SOURCE is defined but without it seems
 dnl to be fine
 case "$ac_cv_host" in
-   *openbsd* | *solaris* | *irix*)
+   *openbsd* | *solaris* | *irix* | *darwin*)
+   dnl  On darwin, do not define _XOPEN_SOURCE as it will narrow us down too
+   dnl  much regarding function availability, so functions like strcasestr
+   dnl  would be unavailable.
    ;;
    *) AC_DEFINE(_XOPEN_SOURCE, 600, [Define if you have POSIX and XPG specifications])
    ;;
