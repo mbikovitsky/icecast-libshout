@@ -35,7 +35,7 @@ AH_VERBATIM([_mangle], [
 ])
 
 AC_PROG_CC
-AM_PROG_LIBTOOL
+LT_INIT
 
 dnl Set some options based on environment
 
