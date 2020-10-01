@@ -1,4 +1,4 @@
-libshout 2.4.3 (2020????)
+libshout 2.4.3 (20201001)
 
 * Fixed handling of blocking/non-blocking mode
 * Fixed ICY port increment
