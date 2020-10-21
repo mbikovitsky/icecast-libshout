@@ -151,6 +151,8 @@ static shout_connection_return_state_t shout_create_http_request_source(shout_t 
             }
             free(ai);
         }
+        if (shout_queue_str(connection, "Prefer: return=minimal\r\n"))
+            break;
         if (shout_queue_str(connection, "\r\n"))
             break;
 
