@@ -74,7 +74,7 @@ int main()
     if (ret == SHOUTERR_BUSY)
         printf("Connection pending...\n");
 
-    while (ret == SHOUTERR_BUSY) {
+    while (ret == SHOUTERR_BUSY || ret == SHOUTERR_RETRY) {
 #if !(defined(WIN32) && !defined(__MINGW64__) && !defined(__MINGW32__))
         static const struct timespec ts = {.tv_sec = 0, .tv_nsec = 10 * 1000 * 1000};
         nanosleep(&ts, NULL);
