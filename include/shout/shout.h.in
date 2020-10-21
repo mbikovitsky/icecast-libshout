@@ -212,9 +212,6 @@ int shout_set_mount(shout_t *self, const char *mount);
 const char *shout_get_mount(shout_t *self);
 
 /* Other parameters */
-int shout_set_dumpfile(shout_t *self, const char *dumpfile);
-const char *shout_get_dumpfile(shout_t *self);
-
 /* takes a SHOUT_AI_xxxx argument */
 int shout_set_audio_info(shout_t *self, const char *name, const char *value);
 const char *shout_get_audio_info(shout_t *self, const char *name);
@@ -329,6 +326,8 @@ const char *shout_get_description(shout_t *self); // obsolete
 int shout_set_format(shout_t *self, unsigned int format); // obsolete
 unsigned int shout_get_format(shout_t *self); // obsolete
 
+int shout_set_dumpfile(shout_t *self, const char *dumpfile); // obsolete
+const char *shout_get_dumpfile(shout_t *self); // obsolete
 
 #ifdef __cplusplus
 }
