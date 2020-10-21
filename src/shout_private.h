@@ -93,19 +93,6 @@ typedef struct {
     size_t           len;
 } shout_queue_t;
 
-/*
-typedef enum {
-    SHOUT_STATE_UNCONNECTED = 0,
-    SHOUT_STATE_CONNECT_PENDING,
-    SHOUT_STATE_TLS_PENDING,
-    SHOUT_STATE_REQ_CREATION,
-    SHOUT_STATE_REQ_PENDING,
-    SHOUT_STATE_RESP_PENDING,
-    SHOUT_STATE_CONNECTED,
-    SHOUT_STATE_RECONNECT
-} shout_state_e;
-*/
-
 typedef enum {
     SHOUT_SOCKSTATE_UNCONNECTED = 0,
     SHOUT_SOCKSTATE_CONNECTING,
