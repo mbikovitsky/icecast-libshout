@@ -205,6 +205,8 @@ struct shout {
     unsigned int usage;
     /* audio encoding parameters */
     util_dict *audio_info;
+    /* content-language */
+    char *content_language;
 
     /* user-agent to use when doing HTTP login */
     char *useragent;

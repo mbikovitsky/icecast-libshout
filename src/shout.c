@@ -149,6 +149,8 @@ void shout_free(shout_t *self)
         free(self->host);
     if (self->password)
         free(self->password);
+    if (self->content_language)
+        free(self->content_language);
     if (self->mount)
         free(self->mount);
     if (self->user)
@@ -678,6 +680,47 @@ const char *shout_get_agent(shout_t *self)
     return self->useragent;
 }
 
+int shout_set_content_language(shout_t *self, const char *content_language)
+{
+    const char *p;
+
+    if (!self)
+        return SHOUTERR_INSANE;
+
+    if (!content_language) {
+        if (self->content_language)
+            free(self->content_language);
+        return self->error = SHOUTERR_SUCCESS;
+    }
+
+    // we do at least a simple check for the correct format. This will at least detect unsafe chars.
+    for (p = content_language; *p; p++) {
+        if (*p == ' ' || *p == ',')
+            continue;
+        if ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p >= '0' && *p <= '9'))
+            continue;
+        if (*p == '-')
+            continue;
+
+        return self->error = SHOUTERR_INSANE;
+    }
+
+
+    if (self->content_language)
+        free(self->content_language);
+
+    if ( !(self->content_language = _shout_util_strdup(content_language)) )
+        return self->error = SHOUTERR_MALLOC;
+
+    return self->error = SHOUTERR_SUCCESS;
+}
+
+const char *shout_get_content_language(shout_t *self)
+{
+    if (!self)
+        return NULL;
+    return self->content_language;
+}
 
 int shout_set_user(shout_t *self, const char *username)
 {

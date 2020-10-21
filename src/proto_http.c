@@ -125,6 +125,8 @@ static shout_connection_return_state_t shout_create_http_request_source(shout_t 
             break;
         if (shout_queue_printf(connection, "Content-Type: %s\r\n", mimetype))
             break;
+        if (self->content_language && shout_queue_printf(connection, "Content-Language: %s\r\n", self->content_language))
+            break;
         if (poke) {
             if (shout_queue_str(connection, "Content-Length: 0\r\nConnection: Keep-Alive\r\n"))
                 break;

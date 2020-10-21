@@ -223,6 +223,21 @@ const char *shout_get_meta(shout_t *self, const char *name);
 int shout_set_public(shout_t *self, unsigned int make_public);
 unsigned int shout_get_public(shout_t *self);
 
+/* Set the content language.
+ * Values as per RFC5646 Section 2.1.
+ * This lists the target audiance language(s), not the language of songs
+ * (unless the station has a focus on songs in a specific language).
+ * The value of NULL is allowed if the content language is not known or is expected to change.
+ *
+ * Examples:
+ *  A German station with moderations and news in German and Gamern and international songs
+ *  would generally set this to "de-DE".
+ *  A similar station in Switzerland would set this to "de-CH".
+ *  A station with content in Portuguese, and Klingon should set this to "pt, tlh".
+ */
+int shout_set_content_language(shout_t *self, const char *content_language);
+const char *shout_get_content_language(shout_t *self);
+
 /* Set the format of the content to send.
  * * format is one of SHOUT_FORMAT_xxxx.
  * * usage is a bit vector composed of SHOUT_USAGE_xxxx.
