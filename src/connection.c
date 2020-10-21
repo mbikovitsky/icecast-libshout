@@ -563,7 +563,7 @@ int                 shout_connection_connect(shout_connection_t *con, shout_t *s
     if (con->socket != SOCK_ERROR || con->current_socket_state != SHOUT_SOCKSTATE_UNCONNECTED)
         return SHOUTERR_BUSY;
 
-    if (con->nonblocking == SHOUT_BLOCKING_DEFAULT)
+    if (con->nonblocking != SHOUT_BLOCKING_DEFAULT)
         shout_connection_set_nonblocking(con, shout_get_nonblocking(shout));
 
     port = shout->port;
