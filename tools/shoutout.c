@@ -55,8 +55,11 @@ int main (int argc, char *argv[])
     const char *user = "source";
     const char *pass = "hackme";
 
+    unsigned char buf[4096];
     int c = 0;
+    size_t nread = 0;
     int opt_index = 0;
+    shout_t *shout;
 
     while ((c = getopt_long(argc, argv, "h:p:", opts, &opt_index)) != -1) {
         switch (c) {
@@ -96,6 +99,70 @@ int main (int argc, char *argv[])
                 return EXIT_FAILURE;
                 break;
         }
+    }
+
+    shout_init();
+
+    if (!(shout = shout_new())) {
+        printf("Could not allocate shout_t\n");
+        return EXIT_FAILURE;
+    }
+
+    if (shout_set_protocol(shout, proto) != SHOUTERR_SUCCESS) {
+        printf("Error setting protocol: %s\n", shout_get_error(shout));
+        return EXIT_FAILURE;
+    }
+
+    if (shout_set_host(shout, host) != SHOUTERR_SUCCESS) {
+        printf("Error setting hostname: %s\n", shout_get_error(shout));
+        return EXIT_FAILURE;
+    }
+
+    if (shout_set_port(shout, port) != SHOUTERR_SUCCESS) {
+        printf("Error setting port: %s\n", shout_get_error(shout));
+        return EXIT_FAILURE;
+    }
+
+    if (shout_set_mount(shout, mount) != SHOUTERR_SUCCESS) {
+        printf("Error setting mount: %s\n", shout_get_error(shout));
+        return EXIT_FAILURE;
+    }
+
+    if (shout_set_user(shout, user) != SHOUTERR_SUCCESS) {
+        printf("Error setting user: %s\n", shout_get_error(shout));
+        return EXIT_FAILURE;
+    }
+
+    if (shout_set_password(shout, pass) != SHOUTERR_SUCCESS) {
+        printf("Error setting password: %s\n", shout_get_error(shout));
+        return EXIT_FAILURE;
+    }
+
+    if (shout_set_format(shout, SHOUT_FORMAT_OGG) != SHOUTERR_SUCCESS) {
+        printf("Error setting format: %s\n", shout_get_error(shout));
+        return EXIT_FAILURE;
+    }
+
+    if (shout_open(shout) != SHOUTERR_SUCCESS) {
+        printf("Error connecting: %s\n", shout_get_error(shout));
+        return EXIT_FAILURE;
+    }
+
+    while ((nread = fread(buf, 1, sizeof(buf), stdin)) > 0) {
+        if(shout_send(shout, buf, nread) != SHOUTERR_SUCCESS) {
+            printf("Error sending: %s\n", shout_get_error(shout));
+            return EXIT_FAILURE;
+        }
+
+        shout_sync(shout);
+    }
+
+    shout_close(shout);
+    shout_shutdown();
+
+    /* don't return 0 if the loop isn't terminated by EOF */
+    if (feof(stdin) == 0) {
+        return EXIT_FAILURE;
     }
 
     return 0;
