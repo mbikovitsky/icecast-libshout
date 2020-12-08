@@ -28,22 +28,10 @@
 #include <shout/shout.h>
 
 /* only long options need a flag value */
-static int flag = 0;
 #define FLAG_PROTO 1
 #define FLAG_MOUNT 2
 #define FLAG_USER  3
 #define FLAG_PASS  4
-
-static const struct option opts[] = {
-    /* connection options */
-    {"proto", required_argument, &flag, FLAG_PROTO},
-    {"host",  required_argument, NULL, 'h'},
-    {"port",  required_argument, NULL, 'p'},
-    {"mount", required_argument, &flag, FLAG_MOUNT},
-    {"user",  required_argument, &flag, FLAG_USER},
-    {"pass",  required_argument, &flag, FLAG_PASS},
-    {NULL,    0,                 NULL,  0},
-};
 
 static unsigned int string2proto(const char *name)
 {
@@ -54,56 +42,99 @@ static unsigned int string2proto(const char *name)
     return SHOUTERR_INSANE;
 }
 
-int main (int argc, char *argv[])
+static int getopts_shout(int argc, char *argv[], shout_t *shout)
 {
-    /* connection options */
-    unsigned int proto = 0;
-    const char *host = NULL;
-    int port = 0;
-    const char *mount = "/example.ogg"; /* not set by shout_new */
-    const char *user = NULL;
-    const char *pass = "hackme"; /* not set by shout_new */
+    int flag = 0;
+    const struct option possible[] = {
+        /* connection options */
+        {"proto", required_argument, &flag, FLAG_PROTO},
+        {"host",  required_argument, NULL, 'h'},
+        {"port",  required_argument, NULL, 'p'},
+        {"mount", required_argument, &flag, FLAG_MOUNT},
+        {"user",  required_argument, &flag, FLAG_USER},
+        {"pass",  required_argument, &flag, FLAG_PASS},
+        {NULL,    0,                 NULL,  0},
+    };
 
-    unsigned char buf[4096];
-    int c = 0;
-    size_t nread = 0;
-    int opt_index = 0;
-    shout_t *shout;
+    int port;
+    int proto;
+    int c;
+    int i = 0;
 
-    while ((c = getopt_long(argc, argv, "h:p:", opts, &opt_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "h:p:", possible, &i)) != -1) {
         switch (c) {
             case 'h':
-                host = optarg;
+                if (shout_set_host(shout, optarg) != SHOUTERR_SUCCESS) {
+                    printf("Error setting hostname: %s\n",
+                            shout_get_error(shout));
+                    return -1;
+                }
                 break;
+
             case 'p':
                 port = atoi(optarg);
+                if (shout_set_port(shout, port) != SHOUTERR_SUCCESS) {
+                    printf("Error setting port: %s\n",
+                            shout_get_error(shout));
+                    return -1;
+                }
                 break;
+
             case 0: /* long-only option */
                 switch (flag) {
                     case FLAG_PROTO:
                         proto = string2proto(optarg);
+                        if (shout_set_protocol(shout, proto) !=
+                                SHOUTERR_SUCCESS) {
+                            printf("Error setting protocol: %s\n",
+                                    shout_get_error(shout));
+                            return -1;
+                        }
                         break;
                     case FLAG_MOUNT:
-                        mount = optarg;
+                        if (shout_set_mount(shout, optarg) !=
+                                SHOUTERR_SUCCESS) {
+                            printf("Error setting mount: %s\n",
+                                    shout_get_error(shout));
+                            return -1;
+                        }
                         break;
                     case FLAG_USER:
-                        user = optarg;
+                        if (shout_set_user(shout, optarg) !=
+                                SHOUTERR_SUCCESS) {
+                            printf("Error setting user: %s\n",
+                                    shout_get_error(shout));
+                            return -1;
+                        }
                         break;
                     case FLAG_PASS:
-                        pass = optarg;
+                        if (shout_set_password(shout, optarg) !=
+                                SHOUTERR_SUCCESS) {
+                            printf("Error setting password: %s\n",
+                                    shout_get_error(shout));
+                            return -1;
+                        }
                         break;
                     default:
                         fprintf(stderr, "unhandled flag (%d)\n", flag);
-                        return EXIT_FAILURE;
+                        return -1;
                         break;
                 }
                 break;
-            default:
+            default: /* unknown short option */
                 /* TODO: usage() */
-                return EXIT_FAILURE;
+                return -1;
                 break;
         }
     }
+    return 0;
+}
+
+int main (int argc, char *argv[])
+{
+    unsigned char buf[4096];
+    size_t nread = 0;
+    shout_t *shout;
 
     shout_init();
 
@@ -112,39 +143,32 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (proto && (shout_set_protocol(shout, proto) != SHOUTERR_SUCCESS)) {
-        printf("Error setting protocol: %s\n", shout_get_error(shout));
+    if (getopts_shout(argc, argv, shout)) {
         return EXIT_FAILURE;
     }
 
-    if (host && (shout_set_host(shout, host) != SHOUTERR_SUCCESS)) {
-        printf("Error setting hostname: %s\n", shout_get_error(shout));
-        return EXIT_FAILURE;
+    /* mount is not set by shout_new */
+    if (!shout_get_mount(shout)) {
+        if (shout_set_mount(shout, "/example.ogg") != SHOUTERR_SUCCESS) {
+            printf("Error setting mount: %s\n", shout_get_error(shout));
+            return EXIT_FAILURE;
+        }
     }
 
-    if (port && (shout_set_port(shout, port) != SHOUTERR_SUCCESS)) {
-        printf("Error setting port: %s\n", shout_get_error(shout));
-        return EXIT_FAILURE;
+    /* format is not set by shout_new */
+    if(!shout_get_format(shout)) {
+        if (shout_set_format(shout, SHOUT_FORMAT_OGG) != SHOUTERR_SUCCESS) {
+            printf("Error setting format: %s\n", shout_get_error(shout));
+            return EXIT_FAILURE;
+        }
     }
 
-    if (mount && (shout_set_mount(shout, mount) != SHOUTERR_SUCCESS)) {
-        printf("Error setting mount: %s\n", shout_get_error(shout));
-        return EXIT_FAILURE;
-    }
-
-    if (user && (shout_set_user(shout, user) != SHOUTERR_SUCCESS)) {
-        printf("Error setting user: %s\n", shout_get_error(shout));
-        return EXIT_FAILURE;
-    }
-
-    if (pass && (shout_set_password(shout, pass) != SHOUTERR_SUCCESS)) {
-        printf("Error setting password: %s\n", shout_get_error(shout));
-        return EXIT_FAILURE;
-    }
-
-    if (shout_set_format(shout, SHOUT_FORMAT_OGG) != SHOUTERR_SUCCESS) {
-        printf("Error setting format: %s\n", shout_get_error(shout));
-        return EXIT_FAILURE;
+    /* password is not set by shout_new */
+    if (!shout_get_password(shout)) {
+        if (shout_set_password(shout, "hackme") != SHOUTERR_SUCCESS) {
+            printf("Error setting password: %s\n", shout_get_error(shout));
+            return EXIT_FAILURE;
+        }
     }
 
     if (shout_open(shout) != SHOUTERR_SUCCESS) {
