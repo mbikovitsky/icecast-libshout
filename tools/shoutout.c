@@ -34,6 +34,22 @@
 #define FLAG_USER  3
 #define FLAG_PASS  4
 
+void usage_oggfwd(const char *progname)
+{
+    fprintf(stderr,
+        "Usage: %s [OPTIONS] address port password mountpoint\n"
+        "\n"
+        "OPTIONS:\n"
+        "  -d <description>    set stream description\n"
+        "  -g <genre>          set stream genre\n"
+        "  -h                  show this help\n"
+        "  -m <file>           parse metadata from file\n"
+        "  -n <name>           set stream name\n"
+        "  -p                  make stream public\n"
+        "  -u <url>            set stream url\n"
+        , progname);
+}
+
 static unsigned int string2proto(const char *name)
 {
     if (strcmp(name, "http") == 0) return SHOUT_PROTOCOL_HTTP;
