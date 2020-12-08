@@ -56,13 +56,13 @@ static unsigned int string2proto(const char *name)
 
 int main (int argc, char *argv[])
 {
-    /* default connection options */
-    unsigned int proto = SHOUT_PROTOCOL_HTTP;
-    const char *host = "127.0.0.1";
-    int port = 8000;
-    const char *mount = "/example.ogg";
-    const char *user = "source";
-    const char *pass = "hackme";
+    /* connection options */
+    unsigned int proto = 0;
+    const char *host = NULL;
+    int port = 0;
+    const char *mount = "/example.ogg"; /* not set by shout_new */
+    const char *user = NULL;
+    const char *pass = "hackme"; /* not set by shout_new */
 
     unsigned char buf[4096];
     int c = 0;
@@ -112,32 +112,32 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (shout_set_protocol(shout, proto) != SHOUTERR_SUCCESS) {
+    if (proto && (shout_set_protocol(shout, proto) != SHOUTERR_SUCCESS)) {
         printf("Error setting protocol: %s\n", shout_get_error(shout));
         return EXIT_FAILURE;
     }
 
-    if (shout_set_host(shout, host) != SHOUTERR_SUCCESS) {
+    if (host && (shout_set_host(shout, host) != SHOUTERR_SUCCESS)) {
         printf("Error setting hostname: %s\n", shout_get_error(shout));
         return EXIT_FAILURE;
     }
 
-    if (shout_set_port(shout, port) != SHOUTERR_SUCCESS) {
+    if (port && (shout_set_port(shout, port) != SHOUTERR_SUCCESS)) {
         printf("Error setting port: %s\n", shout_get_error(shout));
         return EXIT_FAILURE;
     }
 
-    if (shout_set_mount(shout, mount) != SHOUTERR_SUCCESS) {
+    if (mount && (shout_set_mount(shout, mount) != SHOUTERR_SUCCESS)) {
         printf("Error setting mount: %s\n", shout_get_error(shout));
         return EXIT_FAILURE;
     }
 
-    if (shout_set_user(shout, user) != SHOUTERR_SUCCESS) {
+    if (user && (shout_set_user(shout, user) != SHOUTERR_SUCCESS)) {
         printf("Error setting user: %s\n", shout_get_error(shout));
         return EXIT_FAILURE;
     }
 
-    if (shout_set_password(shout, pass) != SHOUTERR_SUCCESS) {
+    if (pass && (shout_set_password(shout, pass) != SHOUTERR_SUCCESS)) {
         printf("Error setting password: %s\n", shout_get_error(shout));
         return EXIT_FAILURE;
     }
