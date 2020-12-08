@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2020      Philipp "ph3-der-loewe" Schafft <lion@lion.leolix.org>
+ *  Copyright (C) 2020      Jakob Wied <jawied@de.loewenfelsen.net>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
