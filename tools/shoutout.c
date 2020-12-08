@@ -59,6 +59,69 @@ static unsigned int string2proto(const char *name)
     return SHOUTERR_INSANE;
 }
 
+static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
+{
+    const int ok = SHOUTERR_SUCCESS; /* helps to keep lines at 80 chars */
+    int c;
+
+    while ((c = getopt(argc, argv, "d:g:hm:n:pu:")) != -1) {
+        switch (c) {
+            case 'd':
+                if (shout_set_meta(shout, "description", optarg) != ok) {
+                    printf("Error setting description: %s\n",
+                            shout_get_error(shout));
+                    return -1;
+                }
+                break;
+
+            case 'g':
+                if (shout_set_meta(shout, "genre", optarg) != ok) {
+                    printf("Error setting genre: %s\n",
+                            shout_get_error(shout));
+                    return -1;
+                }
+                break;
+
+            case 'h':
+                usage_oggfwd(argv[0]);
+                return -1; /* stop further processing */
+
+            case 'm':
+                fprintf(stderr, "TODO: process \"-m\"\n");
+                return -1;
+
+            case 'n':
+                if (shout_set_meta(shout, "name", optarg) != ok) {
+                    printf("Error setting name: %s\n",
+                            shout_get_error(shout));
+                    return -1;
+                }
+                break;
+
+            case 'p':
+                if (shout_set_public(shout, 1) != ok) {
+                    printf("Error setting public: %s\n",
+                            shout_get_error(shout));
+                    return -1;
+                }
+                break;
+
+            case 'u':
+                if (shout_set_meta(shout, "url", optarg) != ok) {
+                    printf("Error setting url: %s\n",
+                            shout_get_error(shout));
+                    return -1;
+                }
+                break;
+
+            default:
+                usage_oggfwd(argv[0]);
+                return -1;
+       }
+    }
+    return 0;
+}
+
 static int getopts_shout(int argc, char *argv[], shout_t *shout)
 {
     int flag = 0;
