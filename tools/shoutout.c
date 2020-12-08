@@ -45,6 +45,15 @@ static const struct option opts[] = {
     {NULL,    0,                 NULL,  0},
 };
 
+static unsigned int string2proto(const char *name)
+{
+    if (strcmp(name, "http") == 0) return SHOUT_PROTOCOL_HTTP;
+    if (strcmp(name, "icy") == 0)  return SHOUT_PROTOCOL_ICY;
+    if (strcmp(name, "roar") == 0) return SHOUT_PROTOCOL_ROARAUDIO;
+
+    return SHOUTERR_INSANE;
+}
+
 int main (int argc, char *argv[])
 {
     /* default connection options */
@@ -72,12 +81,7 @@ int main (int argc, char *argv[])
             case 0: /* long-only option */
                 switch (flag) {
                     case FLAG_PROTO:
-                        if (strcmp(optarg, "http") == 0) {
-                            proto = SHOUT_PROTOCOL_HTTP;
-                        } else {
-                            fprintf(stderr, "%s: invalid protocol\n", optarg);
-                            return EXIT_FAILURE;
-                        }
+                        proto = string2proto(optarg);
                         break;
                     case FLAG_MOUNT:
                         mount = optarg;
