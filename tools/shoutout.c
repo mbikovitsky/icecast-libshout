@@ -28,7 +28,7 @@
 #include <shout/shout.h>
 
 /* only long options need a flag value */
-int flag = 0;
+static int flag = 0;
 #define FLAG_PROTO 1
 #define FLAG_MOUNT 2
 #define FLAG_USER  3
@@ -165,5 +165,5 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
