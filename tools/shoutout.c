@@ -18,6 +18,7 @@
  */
 
 #include <getopt.h>
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -213,7 +214,9 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
 int main (int argc, char *argv[])
 {
     unsigned char buf[4096];
+    int err;
     size_t nread = 0;
+    const char *progname; /* don't use __progname from glibc */
     shout_t *shout;
 
     shout_init();
@@ -223,7 +226,12 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (getopts_shout(argc, argv, shout)) {
+    if ((progname = basename(argv[0])) && (strcmp(progname, "oggfwd") == 0)) {
+        err = getopts_oggfwd(argc, argv, shout);
+    } else {
+        err = getopts_shout(argc, argv, shout);
+    }
+    if (err) {
         return EXIT_FAILURE;
     }
 
