@@ -112,6 +112,10 @@ static int parse_metadata_file(const char *path, shout_t *shout)
         } else if (strcmp(line, "url") == 0) {
             shout_set_meta(shout, "url", pos);
         } else {
+            /* NOTE: Maybe we should try to set invalid keys.
+             * However, this wouldn't be consistent with the cli options
+             * which only allow description, genre, name, and url.
+             */
             fprintf(stderr, "%s:%d: \"%s\" is not a valid key\n",
                     path, lineno, line);
             continue; /* oggfwd doesn't abort */
