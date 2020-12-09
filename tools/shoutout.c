@@ -118,7 +118,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
             default:
                 usage_oggfwd(argv[0]);
                 return -1;
-       }
+        }
     }
     return 0;
 }
