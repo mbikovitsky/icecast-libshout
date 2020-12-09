@@ -120,6 +120,34 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
                 return -1;
         }
     }
+
+    /* need exacly 4 remaining arguments */
+    if ((argc - optind) != 4) {
+        fprintf(stderr, "Wrong number of arguments\n");
+        usage_oggfwd(argv[0]);
+        return -1;
+    }
+
+    if (shout_set_host(shout, argv[optind++]) != SHOUTERR_SUCCESS) {
+        printf("Error setting hostname: %s\n", shout_get_error(shout));
+        return -1;
+    }
+
+    if (shout_set_port(shout, atoi(argv[optind++])) != SHOUTERR_SUCCESS) {
+        printf("Error setting port: %s\n", shout_get_error(shout));
+        return -1;
+    }
+
+    if (shout_set_password(shout, argv[optind++]) != SHOUTERR_SUCCESS) {
+        printf("Error setting password: %s\n", shout_get_error(shout));
+        return -1;
+    }
+
+    if (shout_set_mount(shout, argv[optind++]) != SHOUTERR_SUCCESS) {
+        printf("Error setting mount: %s\n", shout_get_error(shout));
+        return -1;
+    }
+
     return 0;
 }
 
