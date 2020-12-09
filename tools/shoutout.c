@@ -51,6 +51,83 @@ void usage_oggfwd(const char *progname)
         , progname);
 }
 
+/* parse_metadata_file is called at `oggfwd -m`.
+ * It fills the shout struct with information read from file.
+ * It returns 0 on success, or -1 on error.
+ */
+static int parse_metadata_file(const char *path, shout_t *shout)
+{
+    FILE *fh;
+    char line[256];
+    int lineno = 0;
+    size_t len;
+    char *pos;
+    char c;
+
+    if ((fh = fopen(path, "r")) == NULL) {
+        perror(path);
+        return -1;
+    }
+
+    while (fgets(line, sizeof(line), fh)) {
+        lineno++;
+
+        len = strlen(line);
+        if (len == 0) {
+            continue;
+        }
+
+        /* skip comments and empty lines */
+        c = line[0];
+        if ((c == '#') || (c == '\r') || (c == '\n')) {
+            continue;
+        }
+
+        /* strip line endings */
+        if (line[len-1] == '\n') {
+            line[len-1] = '\0';
+            len--;
+        }
+        if (line[len-1] == '\r') {
+            line[len-1] = '\0';
+            len--;
+        }
+
+        /* find '=' */
+        if ((pos = strchr(line, '=')) == NULL) {
+            fprintf(stderr, "%s:%d: syntax error\n", path, lineno);
+            continue; /* oggfwd doesn't abort */
+        }
+
+        *pos = '\0'; /* terminate key */
+        pos++;
+
+        /* oggfwd ignores the result of shout_set_* */
+        if (strcmp(line, "description") == 0) {
+            shout_set_meta(shout, "description", pos);
+        } else if (strcmp(line, "genre") == 0) {
+            shout_set_meta(shout, "genre", pos);
+        } else if (strcmp(line, "name") == 0) {
+            shout_set_meta(shout, "name", pos);
+        } else if (strcmp(line, "url") == 0) {
+            shout_set_meta(shout, "url", pos);
+        } else {
+            fprintf(stderr, "%s:%d: \"%s\" is not a valid key\n",
+                    path, lineno, line);
+            continue; /* oggfwd doesn't abort */
+        }
+    }
+
+    if (feof(fh) == 0) {
+        perror(path);
+        fclose(fh);
+        return -1;
+    }
+
+    fclose(fh);
+    return 0;
+}
+
 static unsigned int string2proto(const char *name)
 {
     if (strcmp(name, "http") == 0) return SHOUT_PROTOCOL_HTTP;
@@ -88,8 +165,10 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
                 return -1; /* stop further processing */
 
             case 'm':
-                fprintf(stderr, "TODO: process \"-m\"\n");
-                return -1;
+                if (parse_metadata_file(optarg, shout) != 0) {
+                    return -1;
+                }
+                break;
 
             case 'n':
                 if (shout_set_meta(shout, "name", optarg) != ok) {
