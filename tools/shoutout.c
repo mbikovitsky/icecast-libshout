@@ -341,6 +341,19 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                 break;
         }
     }
+
+    /* prohibit trailing arguments
+     * NOTE: maybe we should treat them as input files
+     */
+    if (optind != argc) {
+        for (; optind < argc; optind++) {
+            fprintf(stderr, "%s: unused argument\n", argv[optind]);
+        }
+        fprintf(stderr, "\n"); /* don't stick usage to warnings */
+        usage_shout(argv[0]);
+        return -1;
+    }
+
     return 0;
 }
 
