@@ -119,14 +119,14 @@ static int parse_metadata_file(const char *path, shout_t *shout)
         pos++;
 
         /* oggfwd ignores the result of shout_set_* */
-        if (strcmp(line, "description") == 0) {
-            shout_set_meta(shout, "description", pos);
-        } else if (strcmp(line, "genre") == 0) {
-            shout_set_meta(shout, "genre", pos);
-        } else if (strcmp(line, "name") == 0) {
-            shout_set_meta(shout, "name", pos);
-        } else if (strcmp(line, "url") == 0) {
-            shout_set_meta(shout, "url", pos);
+        if (strcmp(line, SHOUT_META_DESCRIPTION) == 0) {
+            shout_set_meta(shout, SHOUT_META_DESCRIPTION, pos);
+        } else if (strcmp(line, SHOUT_META_GENRE) == 0) {
+            shout_set_meta(shout, SHOUT_META_GENRE, pos);
+        } else if (strcmp(line, SHOUT_META_NAME) == 0) {
+            shout_set_meta(shout, SHOUT_META_NAME, pos);
+        } else if (strcmp(line, SHOUT_META_URL) == 0) {
+            shout_set_meta(shout, SHOUT_META_URL, pos);
         } else {
             /* NOTE: Maybe we should try to set invalid keys.
              * However, this wouldn't be consistent with the cli options
@@ -165,7 +165,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
     while ((c = getopt(argc, argv, "d:g:hm:n:pu:")) != -1) {
         switch (c) {
             case 'd':
-                if (shout_set_meta(shout, "description", optarg) != ok) {
+                if (shout_set_meta(shout, SHOUT_META_DESCRIPTION, optarg) != ok) {
                     printf("Error setting description: %s\n",
                             shout_get_error(shout));
                     return -1;
@@ -173,7 +173,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
                 break;
 
             case 'g':
-                if (shout_set_meta(shout, "genre", optarg) != ok) {
+                if (shout_set_meta(shout, SHOUT_META_GENRE, optarg) != ok) {
                     printf("Error setting genre: %s\n",
                             shout_get_error(shout));
                     return -1;
@@ -191,7 +191,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
                 break;
 
             case 'n':
-                if (shout_set_meta(shout, "name", optarg) != ok) {
+                if (shout_set_meta(shout, SHOUT_META_NAME, optarg) != ok) {
                     printf("Error setting name: %s\n",
                             shout_get_error(shout));
                     return -1;
@@ -207,7 +207,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
                 break;
 
             case 'u':
-                if (shout_set_meta(shout, "url", optarg) != ok) {
+                if (shout_set_meta(shout, SHOUT_META_URL, optarg) != ok) {
                     printf("Error setting url: %s\n",
                             shout_get_error(shout));
                     return -1;
