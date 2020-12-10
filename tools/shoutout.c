@@ -30,10 +30,13 @@
 #include <shout/shout.h>
 
 /* only long options need a flag value */
-#define FLAG_PROTO 1
-#define FLAG_MOUNT 2
-#define FLAG_USER  3
-#define FLAG_PASS  4
+enum flag {
+    FLAG__NONE = 0,
+    FLAG_PROTO = 1,
+    FLAG_MOUNT = 2,
+    FLAG_USER  = 3,
+    FLAG_PASS  = 4
+};
 
 void usage_oggfwd(const char *progname)
 {
@@ -252,7 +255,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
 
 static int getopts_shout(int argc, char *argv[], shout_t *shout)
 {
-    int flag = 0;
+    int flag = FLAG__NONE;
     const struct option possible[] = {
         /* connection options */
         {"proto", required_argument, &flag, FLAG_PROTO},
@@ -295,7 +298,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                 break;
 
             case 0: /* long-only option */
-                switch (flag) {
+                switch ((enum flag)flag) {
                     case FLAG_PROTO:
                         proto = string2proto(optarg);
                         if (shout_set_protocol(shout, proto) !=
