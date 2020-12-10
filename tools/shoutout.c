@@ -240,8 +240,8 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
     const struct option possible[] = {
         /* connection options */
         {"proto", required_argument, &flag, FLAG_PROTO},
-        {"host",  required_argument, NULL, 'h'},
-        {"port",  required_argument, NULL, 'p'},
+        {"host",  required_argument, NULL, 'H'},
+        {"port",  required_argument, NULL, 'P'},
         {"mount", required_argument, &flag, FLAG_MOUNT},
         {"user",  required_argument, &flag, FLAG_USER},
         {"pass",  required_argument, &flag, FLAG_PASS},
@@ -253,9 +253,9 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
     int c;
     int i = 0;
 
-    while ((c = getopt_long(argc, argv, "h:p:", possible, &i)) != -1) {
+    while ((c = getopt_long(argc, argv, "H:P:", possible, &i)) != -1) {
         switch (c) {
-            case 'h':
+            case 'H':
                 if (shout_set_host(shout, optarg) != SHOUTERR_SUCCESS) {
                     printf("Error setting hostname: %s\n",
                             shout_get_error(shout));
@@ -263,7 +263,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                 }
                 break;
 
-            case 'p':
+            case 'P':
                 port = atoi(optarg);
                 if (shout_set_port(shout, port) != SHOUTERR_SUCCESS) {
                     printf("Error setting port: %s\n",
