@@ -51,6 +51,22 @@ void usage_oggfwd(const char *progname)
         , progname);
 }
 
+void usage_shout(const char *progname)
+{
+    fprintf(stderr,
+        "Usage: %s [OPTIONS]\n"
+        "\n"
+        "OPTIONS:\n"
+        "  -H <host>, --host <host>    set host\n"
+        "  -h, --help                  show this help\n"
+        "  --mount <mountpoint>        set mountpoint\n"
+        "  -P <port>, --port <port>    set port\n"
+        "  --pass <password>           set source password\n"
+        "  --proto <protocol>          set protocol (e.g. \"http\")\n"
+        "  --user <user>               set source user\n"
+        , progname);
+}
+
 /* parse_metadata_file is called at `oggfwd -m`.
  * It fills the shout struct with information read from file.
  * It returns 0 on success, or -1 on error.
@@ -245,6 +261,8 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
         {"mount", required_argument, &flag, FLAG_MOUNT},
         {"user",  required_argument, &flag, FLAG_USER},
         {"pass",  required_argument, &flag, FLAG_PASS},
+        /* other options */
+        {"help",  no_argument,       NULL, 'h'},
         {NULL,    0,                 NULL,  0},
     };
 
@@ -253,7 +271,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
     int c;
     int i = 0;
 
-    while ((c = getopt_long(argc, argv, "H:P:", possible, &i)) != -1) {
+    while ((c = getopt_long(argc, argv, "H:hP:", possible, &i)) != -1) {
         switch (c) {
             case 'H':
                 if (shout_set_host(shout, optarg) != SHOUTERR_SUCCESS) {
@@ -262,6 +280,10 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                     return -1;
                 }
                 break;
+
+            case 'h':
+                usage_shout(argv[0]);
+                return -1;
 
             case 'P':
                 port = atoi(optarg);
@@ -308,13 +330,13 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                         }
                         break;
                     default:
-                        fprintf(stderr, "unhandled flag (%d)\n", flag);
+                        usage_shout(argv[0]);
                         return -1;
                         break;
                 }
                 break;
             default: /* unknown short option */
-                /* TODO: usage() */
+                usage_shout(argv[0]);
                 return -1;
                 break;
         }
