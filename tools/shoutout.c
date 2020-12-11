@@ -38,6 +38,15 @@ enum flag {
     FLAG_PASS  = 4
 };
 
+static unsigned int string2proto(const char *name)
+{
+    if (strcmp(name, "http") == 0) return SHOUT_PROTOCOL_HTTP;
+    if (strcmp(name, "icy") == 0)  return SHOUT_PROTOCOL_ICY;
+    if (strcmp(name, "roar") == 0) return SHOUT_PROTOCOL_ROARAUDIO;
+
+    return SHOUTERR_INSANE;
+}
+
 void usage_oggfwd(const char *progname)
 {
     fprintf(stderr,
@@ -149,15 +158,6 @@ static int parse_metadata_file(const char *path, shout_t *shout)
 
     fclose(fh);
     return 0;
-}
-
-static unsigned int string2proto(const char *name)
-{
-    if (strcmp(name, "http") == 0) return SHOUT_PROTOCOL_HTTP;
-    if (strcmp(name, "icy") == 0)  return SHOUT_PROTOCOL_ICY;
-    if (strcmp(name, "roar") == 0) return SHOUT_PROTOCOL_ROARAUDIO;
-
-    return SHOUTERR_INSANE;
 }
 
 static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
