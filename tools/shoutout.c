@@ -244,7 +244,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
         switch (c) {
             case 'd':
                 if (shout_set_meta(shout, SHOUT_META_DESCRIPTION, optarg) != ok) {
-                    printf("Error setting description: %s\n",
+                    fprintf(stderr, "Error setting description: %s\n",
                             shout_get_error(shout));
                     return -1;
                 }
@@ -252,7 +252,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
 
             case 'g':
                 if (shout_set_meta(shout, SHOUT_META_GENRE, optarg) != ok) {
-                    printf("Error setting genre: %s\n",
+                    fprintf(stderr, "Error setting genre: %s\n",
                             shout_get_error(shout));
                     return -1;
                 }
@@ -270,7 +270,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
 
             case 'n':
                 if (shout_set_meta(shout, SHOUT_META_NAME, optarg) != ok) {
-                    printf("Error setting name: %s\n",
+                    fprintf(stderr, "Error setting name: %s\n",
                             shout_get_error(shout));
                     return -1;
                 }
@@ -278,7 +278,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
 
             case 'p':
                 if (shout_set_public(shout, 1) != ok) {
-                    printf("Error setting public: %s\n",
+                    fprintf(stderr, "Error setting public: %s\n",
                             shout_get_error(shout));
                     return -1;
                 }
@@ -286,19 +286,19 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
 
             case 'u':
                 if (shout_set_meta(shout, SHOUT_META_URL, optarg) != ok) {
-                    printf("Error setting url: %s\n",
+                    fprintf(stderr, "Error setting url: %s\n",
                             shout_get_error(shout));
                     return -1;
                 }
                 break;
             case 'T':
                 if (string2tlsmode(optarg, &tls_mode) != 0) {
-                    printf("Error parsing TLS mode: %s: Invalid protocol name", optarg);
+                    fprintf(stderr, "Error parsing TLS mode: %s: Invalid protocol name", optarg);
                     return -1;
                 }
 
                 if (shout_set_tls(shout, tls_mode) != ok) {
-                    printf("Error setting TLS mode: %s\n",
+                    fprintf(stderr, "Error setting TLS mode: %s\n",
                             shout_get_error(shout));
                     return -1;
                 }
@@ -318,22 +318,22 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
     }
 
     if (shout_set_host(shout, argv[optind++]) != SHOUTERR_SUCCESS) {
-        printf("Error setting hostname: %s\n", shout_get_error(shout));
+        fprintf(stderr, "Error setting hostname: %s\n", shout_get_error(shout));
         return -1;
     }
 
     if (shout_set_port(shout, atoi(argv[optind++])) != SHOUTERR_SUCCESS) {
-        printf("Error setting port: %s\n", shout_get_error(shout));
+        fprintf(stderr, "Error setting port: %s\n", shout_get_error(shout));
         return -1;
     }
 
     if (shout_set_password(shout, argv[optind++]) != SHOUTERR_SUCCESS) {
-        printf("Error setting password: %s\n", shout_get_error(shout));
+        fprintf(stderr, "Error setting password: %s\n", shout_get_error(shout));
         return -1;
     }
 
     if (shout_set_mount(shout, argv[optind++]) != SHOUTERR_SUCCESS) {
-        printf("Error setting mount: %s\n", shout_get_error(shout));
+        fprintf(stderr, "Error setting mount: %s\n", shout_get_error(shout));
         return -1;
     }
 
@@ -374,7 +374,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
         switch (c) {
             case 'H':
                 if (shout_set_host(shout, optarg) != SHOUTERR_SUCCESS) {
-                    printf("Error setting hostname: %s\n",
+                    fprintf(stderr, "Error setting hostname: %s\n",
                             shout_get_error(shout));
                     return -1;
                 }
@@ -387,7 +387,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
             case 'P':
                 port = atoi(optarg);
                 if (shout_set_port(shout, port) != SHOUTERR_SUCCESS) {
-                    printf("Error setting port: %s\n",
+                    fprintf(stderr, "Error setting port: %s\n",
                             shout_get_error(shout));
                     return -1;
                 }
@@ -397,12 +397,12 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                 switch ((enum flag)flag) {
                     case FLAG_PROTO:
                         if (string2proto(optarg, &proto) != 0) {
-                            printf("Error parsing protocol: %s: Invalid protocol name\n", optarg);
+                            fprintf(stderr, "Error parsing protocol: %s: Invalid protocol name\n", optarg);
                             return -1;
                         }
                         if (shout_set_protocol(shout, proto) !=
                                 SHOUTERR_SUCCESS) {
-                            printf("Error setting protocol: %s\n",
+                            fprintf(stderr, "Error setting protocol: %s\n",
                                     shout_get_error(shout));
                             return -1;
                         }
@@ -410,7 +410,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                     case FLAG_MOUNT:
                         if (shout_set_mount(shout, optarg) !=
                                 SHOUTERR_SUCCESS) {
-                            printf("Error setting mount: %s\n",
+                            fprintf(stderr, "Error setting mount: %s\n",
                                     shout_get_error(shout));
                             return -1;
                         }
@@ -418,7 +418,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                     case FLAG_USER:
                         if (shout_set_user(shout, optarg) !=
                                 SHOUTERR_SUCCESS) {
-                            printf("Error setting user: %s\n",
+                            fprintf(stderr, "Error setting user: %s\n",
                                     shout_get_error(shout));
                             return -1;
                         }
@@ -426,20 +426,20 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                     case FLAG_PASS:
                         if (shout_set_password(shout, optarg) !=
                                 SHOUTERR_SUCCESS) {
-                            printf("Error setting password: %s\n",
+                            fprintf(stderr, "Error setting password: %s\n",
                                     shout_get_error(shout));
                             return -1;
                         }
                         break;
                     case FLAG_TLS_MODE:
                         if (string2tlsmode(optarg, &tls_mode) != 0) {
-                            printf("Error parsing TLS mode: %s: Invalid protocol name", optarg);
+                            fprintf(stderr, "Error parsing TLS mode: %s: Invalid protocol name", optarg);
                             return -1;
                         }
 
                         if (shout_set_tls(shout, tls_mode) !=
                                 SHOUTERR_SUCCESS) {
-                            printf("Error setting TLS mode: %s\n",
+                            fprintf(stderr, "Error setting TLS mode: %s\n",
                                     shout_get_error(shout));
                             return -1;
                         }
@@ -448,25 +448,25 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                     /* metadata options */
                     case FLAG_DESCRIPTION:
                         if (shout_set_meta(shout, SHOUT_META_DESCRIPTION, optarg) != SHOUTERR_SUCCESS) {
-                            printf("Error setting description: %s\n", shout_get_error(shout));
+                            fprintf(stderr, "Error setting description: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
                     case FLAG_GENRE:
                         if (shout_set_meta(shout, SHOUT_META_GENRE, optarg) != SHOUTERR_SUCCESS) {
-                            printf("Error setting genre: %s\n", shout_get_error(shout));
+                            fprintf(stderr, "Error setting genre: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
                     case FLAG_NAME:
                         if (shout_set_meta(shout, SHOUT_META_NAME, optarg) != SHOUTERR_SUCCESS) {
-                            printf("Error setting name: %s\n", shout_get_error(shout));
+                            fprintf(stderr, "Error setting name: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
                     case FLAG_URL:
                         if (shout_set_meta(shout, SHOUT_META_URL, optarg) != SHOUTERR_SUCCESS) {
-                            printf("Error setting URL: %s\n", shout_get_error(shout));
+                            fprintf(stderr, "Error setting URL: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
@@ -474,11 +474,11 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                     /* other options */
                     case FLAG_FORMAT:
                         if (string2format(optarg, &format, &format_usage) != 0) {
-                            printf("%s: Invalid format name\n", optarg);
+                            fprintf(stderr, "%s: Invalid format name\n", optarg);
                             return -1;
                         }
                         if (shout_set_content_format(shout, format, format_usage, NULL) != SHOUTERR_SUCCESS) {
-                            printf("Error setting format: %s\n",
+                            fprintf(stderr, "Error setting format: %s\n",
                                     shout_get_error(shout));
                             return -1;
                         }
@@ -522,7 +522,7 @@ int main (int argc, char *argv[])
     shout_init();
 
     if (!(shout = shout_new())) {
-        printf("Could not allocate shout_t\n");
+        fprintf(stderr, "Could not allocate shout_t\n");
         return EXIT_FAILURE;
     }
 
@@ -538,7 +538,7 @@ int main (int argc, char *argv[])
     /* mount is not set by shout_new */
     if (!shout_get_mount(shout)) {
         if (shout_set_mount(shout, "/example.ogg") != SHOUTERR_SUCCESS) {
-            printf("Error setting mount: %s\n", shout_get_error(shout));
+            fprintf(stderr, "Error setting mount: %s\n", shout_get_error(shout));
             return EXIT_FAILURE;
         }
     }
@@ -546,19 +546,19 @@ int main (int argc, char *argv[])
     /* password is not set by shout_new */
     if (!shout_get_password(shout)) {
         if (shout_set_password(shout, "hackme") != SHOUTERR_SUCCESS) {
-            printf("Error setting password: %s\n", shout_get_error(shout));
+            fprintf(stderr, "Error setting password: %s\n", shout_get_error(shout));
             return EXIT_FAILURE;
         }
     }
 
     if (shout_open(shout) != SHOUTERR_SUCCESS) {
-        printf("Error connecting: %s\n", shout_get_error(shout));
+        fprintf(stderr, "Error connecting: %s\n", shout_get_error(shout));
         return EXIT_FAILURE;
     }
 
     while ((nread = fread(buf, 1, sizeof(buf), stdin)) > 0) {
         if(shout_send(shout, buf, nread) != SHOUTERR_SUCCESS) {
-            printf("Error sending: %s\n", shout_get_error(shout));
+            fprintf(stderr, "Error sending: %s\n", shout_get_error(shout));
             return EXIT_FAILURE;
         }
 
