@@ -36,7 +36,8 @@ enum flag {
     FLAG_MOUNT      = 2,
     FLAG_USER       = 3,
     FLAG_PASS       = 4,
-    FLAG_TLS_MODE   = 5
+    FLAG_TLS_MODE   = 5,
+    FLAG_FORMAT     = 6,
 };
 
 #ifdef SHOUT_TLS
@@ -44,6 +45,27 @@ static const char supported_tls_modes[] = "disabled|auto|auto_no_plain|rfc2818|r
 #else
 static const char supported_tls_modes[] = "disabled";
 #endif
+
+static inline int string2format(const char *name, unsigned int *format, unsigned int *usage)
+{
+    if (!format || !usage)
+        return -1;
+
+    if (strcmp(name, "ogg") == 0) {
+        *format = SHOUT_FORMAT_OGG;
+        *usage = SHOUT_USAGE_UNKNOWN;
+    } else if (strcmp(name, "mp3") == 0) {
+        *format = SHOUT_FORMAT_MP3;
+        *usage = SHOUT_USAGE_AUDIO;
+    } else if (strcmp(name, "webm") == 0) {
+        *format = SHOUT_FORMAT_WEBM;
+        *usage = SHOUT_USAGE_AUDIO|SHOUT_USAGE_VISUAL;
+    } else {
+        return -1;
+    }
+
+    return 0;
+}
 
 static inline int string2proto(const char *name, unsigned int *res)
 {
@@ -109,6 +131,7 @@ void usage_shout(const char *progname)
         "Usage: %s [OPTIONS]\n"
         "\n"
         "OPTIONS:\n"
+        "  --format <format>           set format {ogg|mp3|webm}\n"
         "  -H <host>, --host <host>    set host\n"
         "  -h, --help                  show this help\n"
         "  --mount <mountpoint>        set mountpoint\n"
@@ -320,10 +343,12 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
         {"pass",        required_argument, &flag, FLAG_PASS},
         {"tls-mode",    required_argument, &flag, FLAG_TLS_MODE},
         /* other options */
+        {"format",      required_argument, &flag, FLAG_FORMAT},
         {"help",        no_argument,       NULL, 'h'},
         {NULL,          0,                 NULL,  0},
     };
 
+    unsigned int format, format_usage;
     unsigned int proto;
     int tls_mode;
     int port;
@@ -400,6 +425,17 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                         if (shout_set_tls(shout, tls_mode) !=
                                 SHOUTERR_SUCCESS) {
                             printf("Error setting TLS mode: %s\n",
+                                    shout_get_error(shout));
+                            return -1;
+                        }
+                        break;
+                    case FLAG_FORMAT:
+                        if (string2format(optarg, &format, &format_usage) != 0) {
+                            printf("%s: Invalid format name\n", optarg);
+                            return -1;
+                        }
+                        if (shout_set_content_format(shout, format, format_usage, NULL) != SHOUTERR_SUCCESS) {
+                            printf("Error setting format: %s\n",
                                     shout_get_error(shout));
                             return -1;
                         }
