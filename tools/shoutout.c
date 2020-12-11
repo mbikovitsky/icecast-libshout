@@ -38,13 +38,22 @@ enum flag {
     FLAG_PASS  = 4
 };
 
-static int string2proto(const char *name)
+static inline int string2proto(const char *name, unsigned int *res)
 {
-    if (strcmp(name, "http") == 0) return SHOUT_PROTOCOL_HTTP;
-    if (strcmp(name, "icy") == 0)  return SHOUT_PROTOCOL_ICY;
-    if (strcmp(name, "roar") == 0) return SHOUT_PROTOCOL_ROARAUDIO;
+    if (!res)
+        return -1;
 
-    return SHOUTERR_INSANE;
+    if (strcmp(name, "http") == 0) {
+        *res = SHOUT_PROTOCOL_HTTP;
+    } else if (strcmp(name, "icy") == 0) {
+        *res = SHOUT_PROTOCOL_ICY;
+    } else if (strcmp(name, "roar") == 0) {
+        *res = SHOUT_PROTOCOL_ROARAUDIO;
+    } else {
+        return -1;
+    }
+
+    return 0;
 }
 
 void usage_oggfwd(const char *progname)
@@ -269,8 +278,8 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
         {NULL,    0,                 NULL,  0},
     };
 
+    unsigned int proto;
     int port;
-    int proto;
     int c;
     int i = 0;
 
@@ -300,7 +309,10 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
             case 0: /* long-only option */
                 switch ((enum flag)flag) {
                     case FLAG_PROTO:
-                        proto = string2proto(optarg);
+                        if (string2proto(optarg, &proto) != 0) {
+                            printf("Error parsing protocol: %s: Invalid protocol name\n", optarg);
+                            return -1;
+                        }
                         if (shout_set_protocol(shout, proto) !=
                                 SHOUTERR_SUCCESS) {
                             printf("Error setting protocol: %s\n",
