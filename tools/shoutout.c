@@ -543,14 +543,6 @@ int main (int argc, char *argv[])
         }
     }
 
-    /* format is not set by shout_new */
-    if(!shout_get_format(shout)) {
-        if (shout_set_format(shout, SHOUT_FORMAT_OGG) != SHOUTERR_SUCCESS) {
-            printf("Error setting format: %s\n", shout_get_error(shout));
-            return EXIT_FAILURE;
-        }
-    }
-
     /* password is not set by shout_new */
     if (!shout_get_password(shout)) {
         if (shout_set_password(shout, "hackme") != SHOUTERR_SUCCESS) {
