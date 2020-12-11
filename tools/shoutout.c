@@ -38,6 +38,12 @@ enum flag {
     FLAG_PASS       = 4,
     FLAG_TLS_MODE   = 5,
     FLAG_FORMAT     = 6,
+
+    /* metadata */
+    FLAG_DESCRIPTION = 7,
+    FLAG_GENRE       = 8,
+    FLAG_NAME        = 9,
+    FLAG_URL         = 10,
 };
 
 #ifdef SHOUT_TLS
@@ -131,15 +137,19 @@ void usage_shout(const char *progname)
         "Usage: %s [OPTIONS]\n"
         "\n"
         "OPTIONS:\n"
+        "  --description <string>      set description\n"
         "  --format <format>           set format {ogg|mp3|webm}\n"
+        "  --genre <string>            set genre\n"
         "  -H <host>, --host <host>    set host\n"
         "  -h, --help                  show this help\n"
         "  --mount <mountpoint>        set mountpoint\n"
+        "  --name <string>             set name\n"
         "  -P <port>, --port <port>    set port\n"
         "  --pass <password>           set source password\n"
         "  --proto <protocol>          set protocol (e.g. \"http\")\n"
         "  --user <user>               set source user\n"
         "  --tls-mode <tls-mode>       set TLS mode {%s}\n"
+        "  --url <string>              set URL\n"
         , progname, supported_tls_modes);
 }
 
@@ -342,6 +352,11 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
         {"user",        required_argument, &flag, FLAG_USER},
         {"pass",        required_argument, &flag, FLAG_PASS},
         {"tls-mode",    required_argument, &flag, FLAG_TLS_MODE},
+        /* metadata options */
+        {"description", required_argument, &flag, FLAG_DESCRIPTION},
+        {"genre",       required_argument, &flag, FLAG_GENRE},
+        {"name",        required_argument, &flag, FLAG_NAME},
+        {"url",         required_argument, &flag, FLAG_URL},
         /* other options */
         {"format",      required_argument, &flag, FLAG_FORMAT},
         {"help",        no_argument,       NULL, 'h'},
@@ -429,6 +444,34 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                             return -1;
                         }
                         break;
+
+                    /* metadata options */
+                    case FLAG_DESCRIPTION:
+                        if (shout_set_meta(shout, SHOUT_META_DESCRIPTION, optarg) != SHOUTERR_SUCCESS) {
+                            printf("Error setting description: %s\n", shout_get_error(shout));
+                            return -1;
+                        }
+                        break;
+                    case FLAG_GENRE:
+                        if (shout_set_meta(shout, SHOUT_META_GENRE, optarg) != SHOUTERR_SUCCESS) {
+                            printf("Error setting genre: %s\n", shout_get_error(shout));
+                            return -1;
+                        }
+                        break;
+                    case FLAG_NAME:
+                        if (shout_set_meta(shout, SHOUT_META_NAME, optarg) != SHOUTERR_SUCCESS) {
+                            printf("Error setting name: %s\n", shout_get_error(shout));
+                            return -1;
+                        }
+                        break;
+                    case FLAG_URL:
+                        if (shout_set_meta(shout, SHOUT_META_URL, optarg) != SHOUTERR_SUCCESS) {
+                            printf("Error setting URL: %s\n", shout_get_error(shout));
+                            return -1;
+                        }
+                        break;
+
+                    /* other options */
                     case FLAG_FORMAT:
                         if (string2format(optarg, &format, &format_usage) != 0) {
                             printf("%s: Invalid format name\n", optarg);
