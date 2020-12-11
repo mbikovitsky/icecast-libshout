@@ -31,12 +31,19 @@
 
 /* only long options need a flag value */
 enum flag {
-    FLAG__NONE = 0,
-    FLAG_PROTO = 1,
-    FLAG_MOUNT = 2,
-    FLAG_USER  = 3,
-    FLAG_PASS  = 4
+    FLAG__NONE      = 0,
+    FLAG_PROTO      = 1,
+    FLAG_MOUNT      = 2,
+    FLAG_USER       = 3,
+    FLAG_PASS       = 4,
+    FLAG_TLS_MODE   = 5
 };
+
+#ifdef SHOUT_TLS
+static const char supported_tls_modes[] = "disabled|auto|auto_no_plain|rfc2818|rfc2817";
+#else
+static const char supported_tls_modes[] = "disabled";
+#endif
 
 static inline int string2proto(const char *name, unsigned int *res)
 {
@@ -49,6 +56,28 @@ static inline int string2proto(const char *name, unsigned int *res)
         *res = SHOUT_PROTOCOL_ICY;
     } else if (strcmp(name, "roar") == 0) {
         *res = SHOUT_PROTOCOL_ROARAUDIO;
+    } else {
+        return -1;
+    }
+
+    return 0;
+}
+
+static inline int string2tlsmode(const char *name, int *res)
+{
+    if (!res)
+        return -1;
+
+    if (strcasecmp(name, "disabled") == 0) {
+        *res = SHOUT_TLS_DISABLED;
+    } else if (strcasecmp(name, "auto") == 0) {
+        *res = SHOUT_TLS_AUTO;
+    } else if (strcasecmp(name, "auto_no_plain") == 0) {
+        *res = SHOUT_TLS_AUTO_NO_PLAIN;
+    } else if (strcasecmp(name, "rfc2818") == 0) {
+        *res = SHOUT_TLS_RFC2818;
+    } else if (strcasecmp(name, "rfc2817") == 0) {
+        *res = SHOUT_TLS_RFC2817;
     } else {
         return -1;
     }
@@ -69,7 +98,9 @@ void usage_oggfwd(const char *progname)
         "  -n <name>           set stream name\n"
         "  -p                  make stream public\n"
         "  -u <url>            set stream url\n"
-        , progname);
+        "  –T {%s}\n"
+        "                      set TLS mode\n"
+        , progname, supported_tls_modes);
 }
 
 void usage_shout(const char *progname)
@@ -85,7 +116,8 @@ void usage_shout(const char *progname)
         "  --pass <password>           set source password\n"
         "  --proto <protocol>          set protocol (e.g. \"http\")\n"
         "  --user <user>               set source user\n"
-        , progname);
+        "  --tls-mode <tls-mode>       set TLS mode {%s}\n"
+        , progname, supported_tls_modes);
 }
 
 /* parse_metadata_file is called at `oggfwd -m`.
@@ -173,8 +205,9 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
 {
     const int ok = SHOUTERR_SUCCESS; /* helps to keep lines at 80 chars */
     int c;
+    int tls_mode;
 
-    while ((c = getopt(argc, argv, "d:g:hm:n:pu:")) != -1) {
+    while ((c = getopt(argc, argv, "d:g:hm:n:pu:T:")) != -1) {
         switch (c) {
             case 'd':
                 if (shout_set_meta(shout, SHOUT_META_DESCRIPTION, optarg) != ok) {
@@ -225,6 +258,18 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
                     return -1;
                 }
                 break;
+            case 'T':
+                if (string2tlsmode(optarg, &tls_mode) != 0) {
+                    printf("Error parsing TLS mode: %s: Invalid protocol name", optarg);
+                    return -1;
+                }
+
+                if (shout_set_tls(shout, tls_mode) != ok) {
+                    printf("Error setting TLS mode: %s\n",
+                            shout_get_error(shout));
+                    return -1;
+                }
+                break;
 
             default:
                 usage_oggfwd(argv[0]);
@@ -267,18 +312,20 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
     int flag = FLAG__NONE;
     const struct option possible[] = {
         /* connection options */
-        {"proto", required_argument, &flag, FLAG_PROTO},
-        {"host",  required_argument, NULL, 'H'},
-        {"port",  required_argument, NULL, 'P'},
-        {"mount", required_argument, &flag, FLAG_MOUNT},
-        {"user",  required_argument, &flag, FLAG_USER},
-        {"pass",  required_argument, &flag, FLAG_PASS},
+        {"proto",       required_argument, &flag, FLAG_PROTO},
+        {"host",        required_argument, NULL, 'H'},
+        {"port",        required_argument, NULL, 'P'},
+        {"mount",       required_argument, &flag, FLAG_MOUNT},
+        {"user",        required_argument, &flag, FLAG_USER},
+        {"pass",        required_argument, &flag, FLAG_PASS},
+        {"tls-mode",    required_argument, &flag, FLAG_TLS_MODE},
         /* other options */
-        {"help",  no_argument,       NULL, 'h'},
-        {NULL,    0,                 NULL,  0},
+        {"help",        no_argument,       NULL, 'h'},
+        {NULL,          0,                 NULL,  0},
     };
 
     unsigned int proto;
+    int tls_mode;
     int port;
     int c;
     int i = 0;
@@ -340,6 +387,19 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                         if (shout_set_password(shout, optarg) !=
                                 SHOUTERR_SUCCESS) {
                             printf("Error setting password: %s\n",
+                                    shout_get_error(shout));
+                            return -1;
+                        }
+                        break;
+                    case FLAG_TLS_MODE:
+                        if (string2tlsmode(optarg, &tls_mode) != 0) {
+                            printf("Error parsing TLS mode: %s: Invalid protocol name", optarg);
+                            return -1;
+                        }
+
+                        if (shout_set_tls(shout, tls_mode) !=
+                                SHOUTERR_SUCCESS) {
+                            printf("Error setting TLS mode: %s\n",
                                     shout_get_error(shout));
                             return -1;
                         }
