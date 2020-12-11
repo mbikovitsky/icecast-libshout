@@ -38,7 +38,7 @@ enum flag {
     FLAG_PASS  = 4
 };
 
-static unsigned int string2proto(const char *name)
+static int string2proto(const char *name)
 {
     if (strcmp(name, "http") == 0) return SHOUT_PROTOCOL_HTTP;
     if (strcmp(name, "icy") == 0)  return SHOUT_PROTOCOL_ICY;
