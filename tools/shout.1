@@ -1,0 +1,86 @@
+.Dd $Mdocdate: Dec 12 2020$
+.Dt SHOUT 1
+.Os
+.\"
+.Sh NAME
+.\"
+.Nm shout
+.Nd Icecast source client
+.\"
+.Sh SYNOPSIS
+.\"
+.Nm shout
+.Op Fl \-description Ar string
+.Op Fl \-format Ar format
+.Op Fl \-genre Ar string
+.Op Fl H Ar host | Fl \-host Ar host
+.Op Fl h | Fl \-help
+.Op Fl \-mount Ar string
+.Op Fl \-name Ar string
+.Op Fl P Ar port | Fl \-port Ar port
+.Op Fl \-pass Ar string
+.Op Fl \-proto Ar protocol
+.Op Fl \-user Ar string
+.Op Fl \-tls-mode Ar tls-mode
+.Op Fl \-url Ar string
+.\"
+.Sh DESCRIPTION
+.\"
+.Nm
+reads data from standard input and streams it to Icecast.
+.\"
+.Sh OPTIONS
+.\"
+.Bl -tag -width 4n
+.It Fl \-description Ar string
+Set stream description.
+.\"
+.It Fl \-format Ar format
+Set stream format. This can be "ogg", "mp3", or "webm". Default is "ogg".
+.\"
+.It Fl \-genre Ar string
+Set stream genre.
+.\"
+.It Fl H Ar host
+See
+.Fl \-host
+.\"
+.It Fl \-host Ar host
+Set destination host. Default is "localhost".
+.\"
+.It Fl h
+See
+.Fl \-help
+.\"
+.It Fl \-help
+Show help.
+.\"
+.It Fl \-mount Ar string
+Set mountpoint. Default is "/example.ogg".
+.\"
+.It Fl \-name Ar string
+Set stream name.
+.\"
+.It Fl P Ar port
+See
+.Fl \-port
+.\"
+.It Fl \-port Ar port
+Set destination port. Default is 8000.
+.\"
+.It Fl \-pass Ar string
+Set source password. Default is "hackme".
+.\"
+.It Fl \-proto Ar protocol
+Set protocol. Default is "http".
+.\"
+.It Fl \-user Ar string
+Set source user. Default is "source".
+.\"
+.It Fl \-tls-mode Ar tls-mode
+Set TLS mode. This can be "disabled", "auto", "auto_no_plain", "rfc2818", or "rfc2817". Default is "auto".
+.\"
+.It Fl \-url Ar string
+Set stream URL.
+.\"
+.El
