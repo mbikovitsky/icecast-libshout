@@ -1188,10 +1188,11 @@ int shout_set_tls(shout_t *self, int mode)
     if (!self)
         return SHOUTERR_INSANE;
 
-    if (mode == SHOUT_TLS_DISABLED)
-        return SHOUTERR_SUCCESS;
+    if (mode != SHOUT_TLS_DISABLED &&
+        mode != SHOUT_TLS_AUTO)
+        return self->error = SHOUTERR_UNSUPPORTED;
 
-    return self->error = SHOUTERR_UNSUPPORTED;
+    return SHOUTERR_SUCCESS;
 }
 
 int shout_get_tls(shout_t *self)
