@@ -27,6 +27,13 @@
 #   include <config.h>
 #endif
 
+#ifndef _WIN32
+#include <arpa/inet.h>
+#include <netdb.h>
+#else
+#include <winsock2.h>
+#endif
+
 #include <shout/shout.h>
 
 /* only long options need a flag value */
@@ -111,6 +118,23 @@ static inline int string2tlsmode(const char *name, int *res)
     }
 
     return 0;
+}
+
+static inline int string2port(const char *name, int *res)
+{
+    if (!name || !res)
+        return -1;
+
+    const struct servent *service = getservbyname(name, "tcp");
+    if (service) {
+        *res = ntohs(service->s_port);
+        return 0;
+    } else {
+        *res = atoi(name);
+        if (*res < 1 || *res > 65535)
+            return -1;
+        return 0;
+    }
 }
 
 void usage_oggfwd(const char *progname)
@@ -239,6 +263,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
     const int ok = SHOUTERR_SUCCESS; /* helps to keep lines at 80 chars */
     int c;
     int tls_mode;
+    int port;
 
     while ((c = getopt(argc, argv, "d:g:hm:n:pu:T:")) != -1) {
         switch (c) {
@@ -322,10 +347,15 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
         return -1;
     }
 
-    if (shout_set_port(shout, atoi(argv[optind++])) != SHOUTERR_SUCCESS) {
+    if (string2port(argv[optind], &port) != 0) {
+        fprintf(stderr, "Error parsing port: %s: Invalid port name\n", argv[optind]);
+        return -1;
+    }
+    if (shout_set_port(shout, port) != SHOUTERR_SUCCESS) {
         fprintf(stderr, "Error setting port: %s\n", shout_get_error(shout));
         return -1;
     }
+    optind++;
 
     if (shout_set_password(shout, argv[optind++]) != SHOUTERR_SUCCESS) {
         fprintf(stderr, "Error setting password: %s\n", shout_get_error(shout));
@@ -385,7 +415,10 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                 return -1;
 
             case 'P':
-                port = atoi(optarg);
+                if (string2port(optarg, &port) != 0) {
+                    fprintf(stderr, "Error parsing port: %s: Invalid port name\n", optarg);
+                    return -1;
+                }
                 if (shout_set_port(shout, port) != SHOUTERR_SUCCESS) {
                     fprintf(stderr, "Error setting port: %s\n",
                             shout_get_error(shout));
