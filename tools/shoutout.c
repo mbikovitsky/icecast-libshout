@@ -49,7 +49,7 @@ enum flag {
 #ifdef SHOUT_TLS
 static const char supported_tls_modes[] = "disabled|auto|auto_no_plain|rfc2818|rfc2817";
 #else
-static const char supported_tls_modes[] = "disabled";
+static const char supported_tls_modes[] = "disabled|auto";
 #endif
 
 static inline int string2format(const char *name, unsigned int *format, unsigned int *usage)
