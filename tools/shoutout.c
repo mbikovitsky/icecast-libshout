@@ -689,7 +689,7 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if ((progname = basename(argv[0])) && (strcmp(progname, "oggfwd") == 0)) {
+    if ((progname = basename(argv[0])) && (strcmp(progname, "oggfwd") == 0 || strcmp(progname, "oggfwd.exe") == 0)) {
         err = getopts_oggfwd(argc, argv, shout);
     } else {
         err = getopts_shout(argc, argv, shout);
