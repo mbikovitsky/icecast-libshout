@@ -145,10 +145,12 @@ static inline int string2tlsmode(const char *name, int *res)
 
 static inline int string2port(const char *name, int *res)
 {
+    const struct servent *service;
+
     if (!name || !res)
         return -1;
 
-    const struct servent *service = getservbyname(name, "tcp");
+    service = getservbyname(name, "tcp");
     if (service) {
         *res = ntohs(service->s_port);
         return 0;
