@@ -51,6 +51,31 @@ enum flag {
     FLAG_GENRE       = 8,
     FLAG_NAME        = 9,
     FLAG_URL         = 10,
+
+    /* other */
+    FLAG_USAGE      = 20,
+};
+
+struct format_usage {
+    char *name;
+    unsigned int flag;
+};
+
+static struct format_usage format_usages[] = {
+    {"audio",       SHOUT_USAGE_AUDIO},
+    {"visual",      SHOUT_USAGE_VISUAL},
+    {"text",        SHOUT_USAGE_TEXT},
+    {"subtitle",    SHOUT_USAGE_SUBTITLE},
+    {"light",       SHOUT_USAGE_LIGHT},
+    {"ui",          SHOUT_USAGE_UI},
+    {"metadata",    SHOUT_USAGE_METADATA},
+    {"application", SHOUT_USAGE_APPLICATION},
+    {"control",     SHOUT_USAGE_CONTROL},
+    {"complex",     SHOUT_USAGE_COMPLEX},
+    {"other",       SHOUT_USAGE_OTHER},
+    {"unknown",     SHOUT_USAGE_UNKNOWN},
+    {"3d",          SHOUT_USAGE_3D},
+    {"4d",          SHOUT_USAGE_4D},
 };
 
 #ifdef SHOUT_TLS
@@ -59,20 +84,17 @@ static const char supported_tls_modes[] = "disabled|auto|auto_no_plain|rfc2818|r
 static const char supported_tls_modes[] = "disabled|auto";
 #endif
 
-static inline int string2format(const char *name, unsigned int *format, unsigned int *usage)
+static inline int string2format(const char *name, unsigned int *format)
 {
-    if (!format || !usage)
+    if (!format)
         return -1;
 
     if (strcmp(name, "ogg") == 0) {
         *format = SHOUT_FORMAT_OGG;
-        *usage = SHOUT_USAGE_UNKNOWN;
     } else if (strcmp(name, "mp3") == 0) {
         *format = SHOUT_FORMAT_MP3;
-        *usage = SHOUT_USAGE_AUDIO;
     } else if (strcmp(name, "webm") == 0) {
         *format = SHOUT_FORMAT_WEBM;
-        *usage = SHOUT_USAGE_AUDIO|SHOUT_USAGE_VISUAL;
     } else {
         return -1;
     }
@@ -174,6 +196,7 @@ void usage_shout(const char *progname)
         "  --user <user>               set source user\n"
         "  --tls-mode <tls-mode>       set TLS mode {%s}\n"
         "  --url <string>              set URL\n"
+        "  --usage <usage>             set usage\n"
         , progname, supported_tls_modes);
 }
 
@@ -255,6 +278,35 @@ static int parse_metadata_file(const char *path, shout_t *shout)
     }
 
     fclose(fh);
+    return 0;
+}
+
+static int string2usage(char *str, int *usage)
+{
+    size_t size = sizeof(format_usages) / sizeof(format_usages[0]);
+
+    if (!usage)
+        return -1;
+
+    *usage = 0; /* clean for ORing */
+
+    /* split string on commas */
+    for (char *tok = strtok(str, ","); tok; (tok = strtok(NULL, ","))) {
+        int found = 0;
+
+        /* match token with predefined usages */
+        for (int i = 0; i < size; i++) {
+            if (strcmp(tok, format_usages[i].name) == 0) {
+                *usage |= format_usages[i].flag;
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found)
+            return -1;
+    }
+
     return 0;
 }
 
@@ -389,10 +441,12 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
         {"url",         required_argument, &flag, FLAG_URL},
         /* other options */
         {"format",      required_argument, &flag, FLAG_FORMAT},
+        {"usage",       required_argument, &flag, FLAG_USAGE},
         {"help",        no_argument,       NULL, 'h'},
         {NULL,          0,                 NULL,  0},
     };
 
+    int format_set = 0, format_usage_set = 0;
     unsigned int format, format_usage;
     unsigned int proto;
     int tls_mode;
@@ -506,7 +560,10 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
 
                     /* other options */
                     case FLAG_FORMAT:
-                        if (string2format(optarg, &format, &format_usage) != 0) {
+                        /* backup usage */
+                        shout_get_content_format(shout, &format, &format_usage, NULL);
+
+                        if (string2format(optarg, &format) != 0) {
                             fprintf(stderr, "%s: Invalid format name\n", optarg);
                             return -1;
                         }
@@ -515,7 +572,25 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                                     shout_get_error(shout));
                             return -1;
                         }
+                        format_set = 1; /* may need to set usage below */
                         break;
+
+                    case FLAG_USAGE:
+                        /* backup format */
+                        shout_get_content_format(shout, &format, &format_usage, NULL);
+
+                        if (string2usage(optarg, &format_usage) != 0) {
+                            fprintf(stderr, "Invalid format usage\n");
+                            return -1;
+                        }
+
+                        if (shout_set_content_format(shout, format, format_usage, NULL) != SHOUTERR_SUCCESS) {
+                            fprintf(stderr, "Error setting format and usage: %s\n", shout_get_error(shout));
+                            return -1;
+                        }
+                        format_usage_set = 1; /* don't override usage below */
+                        break;
+
                     default:
                         usage_shout(argv[0]);
                         return -1;
@@ -527,6 +602,30 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                 return -1;
                 break;
         }
+    }
+
+    /* set default usage for format */
+    if (format_set && !format_usage_set) {
+        switch (format) {
+            case SHOUT_FORMAT_OGG:
+                format_usage = SHOUT_USAGE_UNKNOWN;
+                break;
+            case SHOUT_FORMAT_MP3:
+                format_usage = SHOUT_USAGE_AUDIO;
+                break;
+            case SHOUT_FORMAT_WEBM:
+                format_usage = SHOUT_USAGE_AUDIO|SHOUT_USAGE_VISUAL;
+                break;
+            default: /* unknown format => unknown usage */
+                format_usage = SHOUT_USAGE_UNKNOWN;
+                break;
+        }
+
+        if (shout_set_content_format(shout, format, format_usage, NULL) != SHOUTERR_SUCCESS) {
+            fprintf(stderr, "Error setting format and usage: %s\n", shout_get_error(shout));
+            return -1;
+        }
+        format_usage_set = 1;
     }
 
     /* prohibit trailing arguments
