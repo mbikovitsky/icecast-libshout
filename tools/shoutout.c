@@ -283,7 +283,9 @@ static int parse_metadata_file(const char *path, shout_t *shout)
 
 static int string2usage(char *str, int *usage)
 {
-    size_t size = sizeof(format_usages) / sizeof(format_usages[0]);
+    int size = sizeof(format_usages) / sizeof(format_usages[0]);
+    char *tok;
+    int i;
 
     if (!usage)
         return -1;
@@ -291,11 +293,11 @@ static int string2usage(char *str, int *usage)
     *usage = 0; /* clean for ORing */
 
     /* split string on commas */
-    for (char *tok = strtok(str, ","); tok; (tok = strtok(NULL, ","))) {
+    for (tok = strtok(str, ","); tok; (tok = strtok(NULL, ","))) {
         int found = 0;
 
         /* match token with predefined usages */
-        for (int i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
             if (strcmp(tok, format_usages[i].name) == 0) {
                 *usage |= format_usages[i].flag;
                 found = 1;
