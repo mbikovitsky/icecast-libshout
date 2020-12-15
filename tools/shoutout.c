@@ -32,6 +32,8 @@
 #include <netdb.h>
 #else
 #include <winsock2.h>
+#include <io.h>
+#include <fcntl.h>
 #endif
 
 #include <shout/shout.h>
@@ -672,6 +674,13 @@ int main (int argc, char *argv[])
     size_t nread = 0;
     const char *progname; /* don't use __progname from glibc */
     shout_t *shout;
+
+#ifdef _WIN32
+    if (_setmode(_fileno(stdin), _O_BINARY) == -1) {
+        fprintf(stderr, "Could not set stdin to binary mode\n");
+        return EXIT_FAILURE;
+    }
+#endif
 
     shout_init();
 
