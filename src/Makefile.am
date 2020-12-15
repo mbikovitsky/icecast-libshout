@@ -34,7 +34,7 @@ AM_CFLAGS = @XIPH_CFLAGS@
 AM_CPPFLAGS = -I$(top_builddir)/include -I$(srcdir)/common @XIPH_CPPFLAGS@
 
 libshout_la_LIBADD = common/net/libicenet.la common/timing/libicetiming.la common/avl/libiceavl.la\
-		common/httpp/libicehttpp.la $(MAYBE_THREAD_LIB) $(THEORA_LIBS) $(VORBIS_LIBS) $(SPEEX_LIBS) @XIPH_LIBS@
+		common/httpp/libicehttpp.la $(MAYBE_THREAD_LIB) $(THEORA_LIBS) $(OGG_LIBS) $(VORBIS_LIBS) $(SPEEX_LIBS) @XIPH_LIBS@
 
 
 debug:

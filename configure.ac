@@ -124,7 +124,14 @@ then
   AC_DEFINE([NO_THREAD], 1, [Define if you don't want to use the thread library])
 fi
 
-SHOUT_REQUIRES="ogg"
+PKG_CHECK_MODULES([OGG], [ogg], [
+    HAVE_OGG="yes"
+    SHOUT_REQUIRES="$SHOUT_REQUIRES, ogg"
+  ], [
+    XIPH_PATH_OGG(, [AC_MSG_ERROR([required Ogg library not found])])
+  ])
+OGG_LIBS="$OGG_LDFLAGS $OGG_LIBS"
+XIPH_CFLAGS="$XIPH_CFLAGS $OGG_CFLAGS"
 
 PKG_CHECK_MODULES(VORBIS, vorbis, [
     HAVE_VORBIS="yes"
