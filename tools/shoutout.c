@@ -51,6 +51,7 @@ enum flag {
     FLAG_GENRE       = 8,
     FLAG_NAME        = 9,
     FLAG_URL         = 10,
+    FLAG_META        = 11,
 
     /* other */
     FLAG_USAGE      = 20,
@@ -188,6 +189,7 @@ void usage_shout(const char *progname)
         "  --genre <string>            set genre\n"
         "  -H <host>, --host <host>    set host\n"
         "  -h, --help                  show this help\n"
+        "  --meta <key>=<value>        set meta information\n"
         "  --mount <mountpoint>        set mountpoint\n"
         "  --name <string>             set name\n"
         "  -P <port>, --port <port>    set port\n"
@@ -441,6 +443,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
         {"genre",       required_argument, &flag, FLAG_GENRE},
         {"name",        required_argument, &flag, FLAG_NAME},
         {"url",         required_argument, &flag, FLAG_URL},
+        {"meta",        required_argument, &flag, FLAG_META},
         /* other options */
         {"format",      required_argument, &flag, FLAG_FORMAT},
         {"usage",       required_argument, &flag, FLAG_USAGE},
@@ -452,6 +455,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
     unsigned int format, format_usage;
     unsigned int proto;
     int tls_mode;
+    char *pos;
     int port;
     int c;
     int i = 0;
@@ -556,6 +560,19 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                     case FLAG_URL:
                         if (shout_set_meta(shout, SHOUT_META_URL, optarg) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting URL: %s\n", shout_get_error(shout));
+                            return -1;
+                        }
+                        break;
+                    case FLAG_META:
+                        /* find '=' */
+                        if ((pos = strchr(optarg, '=')) == NULL) {
+                            fprintf(stderr, "%s: Missing '='\n", optarg);
+                            return -1;
+                        }
+                        *pos = '\0'; /* terminate key */
+
+                        if (shout_set_meta(shout, optarg, pos + 1) != SHOUTERR_SUCCESS) {
+                            fprintf(stderr, "Error setting meta information: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
