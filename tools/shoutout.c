@@ -285,11 +285,10 @@ static int parse_metadata_file(const char *path, shout_t *shout)
     return 0;
 }
 
-static int string2usage(char *str, int *usage)
+static int string2usage(char *str, unsigned int *usage)
 {
-    int size = sizeof(format_usages) / sizeof(format_usages[0]);
     char *tok;
-    int i;
+    size_t i;
 
     if (!usage)
         return -1;
@@ -301,7 +300,7 @@ static int string2usage(char *str, int *usage)
         int found = 0;
 
         /* match token with predefined usages */
-        for (i = 0; i < size; i++) {
+        for (i = 0; i < (sizeof(format_usages) / sizeof(format_usages[0])); i++) {
             if (strcmp(tok, format_usages[i].name) == 0) {
                 *usage |= format_usages[i].flag;
                 found = 1;
