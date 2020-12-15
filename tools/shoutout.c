@@ -38,23 +38,23 @@
 
 /* only long options need a flag value */
 enum flag {
-    FLAG__NONE      = 0,
-    FLAG_PROTO      = 1,
-    FLAG_MOUNT      = 2,
-    FLAG_USER       = 3,
-    FLAG_PASS       = 4,
-    FLAG_TLS_MODE   = 5,
-    FLAG_FORMAT     = 6,
+    FLAG__NONE                  = 0,
+    FLAG_PROTO                  = 1,
+    FLAG_MOUNT                  = 2,
+    FLAG_USER                   = 3,
+    FLAG_PASS                   = 4,
+    FLAG_TLS_MODE               = 5,
+    FLAG_FORMAT                 = 6,
 
     /* metadata */
-    FLAG_DESCRIPTION = 7,
-    FLAG_GENRE       = 8,
-    FLAG_NAME        = 9,
-    FLAG_URL         = 10,
-    FLAG_META        = 11,
+    FLAG_STATION_DESCRIPTION    = 7,
+    FLAG_STATION_GENRE          = 8,
+    FLAG_STATION_NAME           = 9,
+    FLAG_STATION_URL            = 10,
+    FLAG_STATION_META           = 11,
 
     /* other */
-    FLAG_USAGE      = 20,
+    FLAG_USAGE                  = 20
 };
 
 struct format_usage {
@@ -186,21 +186,23 @@ void usage_shout(const char *progname)
         "Usage: %s [OPTIONS]\n"
         "\n"
         "OPTIONS:\n"
-        "  --description <string>      set description\n"
-        "  --format <format>           set format {ogg|mp3|webm}\n"
-        "  --genre <string>            set genre\n"
-        "  -H <host>, --host <host>    set host\n"
-        "  -h, --help                  show this help\n"
-        "  --meta <key>=<value>        set meta information\n"
-        "  --mount <mountpoint>        set mountpoint\n"
-        "  --name <string>             set name\n"
-        "  -P <port>, --port <port>    set port\n"
-        "  --pass <password>           set source password\n"
-        "  --proto <protocol>          set protocol (e.g. \"http\")\n"
-        "  --user <user>               set source user\n"
-        "  --tls-mode <tls-mode>       set TLS mode {%s}\n"
-        "  --url <string>              set URL\n"
-        "  --usage <usage>             set usage\n"
+        "General options:\n"
+        "  --format <format>                    set format {ogg|mp3|webm}\n"
+        "  -H <host>, --host <host>             set host\n"
+        "  -h, --help                           show this help\n"
+        "  --mount <mountpoint>                 set mountpoint\n"
+        "  -P <port>, --port <port>             set port\n"
+        "  --pass <password>                    set source password\n"
+        "  --proto <protocol>                   set protocol (e.g. \"http\")\n"
+        "  --user <user>                        set source user\n"
+        "  --tls-mode <tls-mode>                set TLS mode {%s}\n"
+        "  --usage <usage>                      set usage\n"
+        "Station metadata options:\n"
+        "  --station-description <string>       set station description\n"
+        "  --station-genre <string>             set station genre\n"
+        "  --station-meta <key>=<value>         set station meta information\n"
+        "  --station-name <string>              set station name\n"
+        "  --station-url <string>               set station URL\n"
         , progname, supported_tls_modes);
 }
 
@@ -432,24 +434,24 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
     int flag = FLAG__NONE;
     const struct option possible[] = {
         /* connection options */
-        {"proto",       required_argument, &flag, FLAG_PROTO},
-        {"host",        required_argument, NULL, 'H'},
-        {"port",        required_argument, NULL, 'P'},
-        {"mount",       required_argument, &flag, FLAG_MOUNT},
-        {"user",        required_argument, &flag, FLAG_USER},
-        {"pass",        required_argument, &flag, FLAG_PASS},
-        {"tls-mode",    required_argument, &flag, FLAG_TLS_MODE},
+        {"proto",               required_argument, &flag, FLAG_PROTO},
+        {"host",                required_argument, NULL, 'H'},
+        {"port",                required_argument, NULL, 'P'},
+        {"mount",               required_argument, &flag, FLAG_MOUNT},
+        {"user",                required_argument, &flag, FLAG_USER},
+        {"pass",                required_argument, &flag, FLAG_PASS},
+        {"tls-mode",            required_argument, &flag, FLAG_TLS_MODE},
         /* metadata options */
-        {"description", required_argument, &flag, FLAG_DESCRIPTION},
-        {"genre",       required_argument, &flag, FLAG_GENRE},
-        {"name",        required_argument, &flag, FLAG_NAME},
-        {"url",         required_argument, &flag, FLAG_URL},
-        {"meta",        required_argument, &flag, FLAG_META},
+        {"station-description", required_argument, &flag, FLAG_STATION_DESCRIPTION},
+        {"station-genre",       required_argument, &flag, FLAG_STATION_GENRE},
+        {"station-name",        required_argument, &flag, FLAG_STATION_NAME},
+        {"station-url",         required_argument, &flag, FLAG_STATION_URL},
+        {"station-meta",        required_argument, &flag, FLAG_STATION_META},
         /* other options */
-        {"format",      required_argument, &flag, FLAG_FORMAT},
-        {"usage",       required_argument, &flag, FLAG_USAGE},
-        {"help",        no_argument,       NULL, 'h'},
-        {NULL,          0,                 NULL,  0},
+        {"format",              required_argument, &flag, FLAG_FORMAT},
+        {"usage",               required_argument, &flag, FLAG_USAGE},
+        {"help",                no_argument,       NULL, 'h'},
+        {NULL,                  0,                 NULL,  0},
     };
 
     int format_set = 0, format_usage_set = 0;
@@ -540,31 +542,31 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                         break;
 
                     /* metadata options */
-                    case FLAG_DESCRIPTION:
+                    case FLAG_STATION_DESCRIPTION:
                         if (shout_set_meta(shout, SHOUT_META_DESCRIPTION, optarg) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting description: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
-                    case FLAG_GENRE:
+                    case FLAG_STATION_GENRE:
                         if (shout_set_meta(shout, SHOUT_META_GENRE, optarg) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting genre: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
-                    case FLAG_NAME:
+                    case FLAG_STATION_NAME:
                         if (shout_set_meta(shout, SHOUT_META_NAME, optarg) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting name: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
-                    case FLAG_URL:
+                    case FLAG_STATION_URL:
                         if (shout_set_meta(shout, SHOUT_META_URL, optarg) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting URL: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
-                    case FLAG_META:
+                    case FLAG_STATION_META:
                         /* find '=' */
                         if ((pos = strchr(optarg, '=')) == NULL) {
                             fprintf(stderr, "%s: Missing '='\n", optarg);
