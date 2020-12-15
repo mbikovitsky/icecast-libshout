@@ -1379,6 +1379,7 @@ static int try_connect(shout_t *self)
     }
 
     ret = shout_connection_iter(self->connection, self);
+    self->error = ret;
 
     if (self->connection->current_message_state == SHOUT_MSGSTATE_SENDING1 && !self->send) {
         int rc;
