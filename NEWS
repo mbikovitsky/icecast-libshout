@@ -1,3 +1,12 @@
+libshout 2.4.5 (202012??)
+* Improved shout.h for reading, and understanding.
+* Marked dumpfile support as obsolete (as SHOUT_PROTOCOL_XAUDIOCAST already is).
+* Added Support for setting the content language.
+* Avoid the use of obsolete functions (#2317).
+* Several small fixes for non-blocking mode (#2321, #2315).
+* Corrected detection of libogg (mostly for windows targets).
+* Now accept TLS mode "auto" when build without TLS support.
+
 libshout 2.4.4 (20201001)
 
 * Fixed handling of blocking/non-blocking mode
