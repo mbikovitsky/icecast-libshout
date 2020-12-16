@@ -27,6 +27,8 @@
 #   include <config.h>
 #endif
 
+#include <stdbool.h>
+
 #ifndef _WIN32
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -174,6 +176,37 @@ int set_mount(shout_t *self, const char *mount)
     return shout_set_mount(self, mount);
 }
 
+int set_meta(shout_t *self, const char *name, const char *value, bool allow_unknown_key)
+{
+
+    if (!name || !value)
+        return SHOUTERR_INSANE;
+
+    if (strcmp(name, SHOUT_META_NAME) != 0 && strcmp(name, SHOUT_META_URL) != 0 &&
+        strcmp(name, SHOUT_META_GENRE) != 0 && strcmp(name, SHOUT_META_DESCRIPTION) != 0 &&
+        strcmp(name, SHOUT_META_IRC) != 0 && strcmp(name, SHOUT_META_AIM) != 0 &&
+        strcmp(name, SHOUT_META_ICQ) != 0) {
+        if (allow_unknown_key) {
+            fprintf(stderr, "Warning: Invalid station metadata key (but trying to set anyway): %s\n", name);
+        } else {
+            // just reject, the caller must handle.
+            return SHOUTERR_INSANE;
+        }
+    }
+
+    if (strcmp(name, SHOUT_META_URL) == 0) {
+        if (strstr(value, ":") == NULL) {
+            fprintf(stderr, "Warning: URL \"%s\" is not absolute. This may not work as expected. Please include a protocol. E.g. \"https://www.example.org/\".\n", value);
+        } else {
+            if (strncmp(value, "http://", 7) != 0 && strncmp(value, "https://", 8) != 0) {
+                fprintf(stderr, "Warning: Unusual protocol in URL \"%s\". This may not work as expected.\n", value);
+            }
+        }
+    }
+
+    return shout_set_meta(self, name, value);
+}
+
 void usage_oggfwd(const char *progname)
 {
     fprintf(stderr,
@@ -269,20 +302,7 @@ static int parse_metadata_file(const char *path, shout_t *shout)
         *pos = '\0'; /* terminate key */
         pos++;
 
-        /* oggfwd ignores the result of shout_set_* */
-        if (strcmp(line, SHOUT_META_DESCRIPTION) == 0) {
-            shout_set_meta(shout, SHOUT_META_DESCRIPTION, pos);
-        } else if (strcmp(line, SHOUT_META_GENRE) == 0) {
-            shout_set_meta(shout, SHOUT_META_GENRE, pos);
-        } else if (strcmp(line, SHOUT_META_NAME) == 0) {
-            shout_set_meta(shout, SHOUT_META_NAME, pos);
-        } else if (strcmp(line, SHOUT_META_URL) == 0) {
-            shout_set_meta(shout, SHOUT_META_URL, pos);
-        } else {
-            /* NOTE: Maybe we should try to set invalid keys.
-             * However, this wouldn't be consistent with the cli options
-             * which only allow description, genre, name, and url.
-             */
+        if (set_meta(shout, line, pos, false) != SHOUTERR_SUCCESS) {
             fprintf(stderr, "%s:%d: \"%s\" is not a valid key\n",
                     path, lineno, line);
             continue; /* oggfwd doesn't abort */
@@ -339,7 +359,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
     while ((c = getopt(argc, argv, "d:g:hm:n:pu:T:")) != -1) {
         switch (c) {
             case 'd':
-                if (shout_set_meta(shout, SHOUT_META_DESCRIPTION, optarg) != ok) {
+                if (set_meta(shout, SHOUT_META_DESCRIPTION, optarg, false) != ok) {
                     fprintf(stderr, "Error setting description: %s\n",
                             shout_get_error(shout));
                     return -1;
@@ -347,7 +367,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
                 break;
 
             case 'g':
-                if (shout_set_meta(shout, SHOUT_META_GENRE, optarg) != ok) {
+                if (set_meta(shout, SHOUT_META_GENRE, optarg, false) != ok) {
                     fprintf(stderr, "Error setting genre: %s\n",
                             shout_get_error(shout));
                     return -1;
@@ -365,7 +385,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
                 break;
 
             case 'n':
-                if (shout_set_meta(shout, SHOUT_META_NAME, optarg) != ok) {
+                if (set_meta(shout, SHOUT_META_NAME, optarg, false) != ok) {
                     fprintf(stderr, "Error setting name: %s\n",
                             shout_get_error(shout));
                     return -1;
@@ -381,7 +401,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
                 break;
 
             case 'u':
-                if (shout_set_meta(shout, SHOUT_META_URL, optarg) != ok) {
+                if (set_meta(shout, SHOUT_META_URL, optarg, false) != ok) {
                     fprintf(stderr, "Error setting url: %s\n",
                             shout_get_error(shout));
                     return -1;
@@ -555,25 +575,25 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
 
                     /* metadata options */
                     case FLAG_STATION_DESCRIPTION:
-                        if (shout_set_meta(shout, SHOUT_META_DESCRIPTION, optarg) != SHOUTERR_SUCCESS) {
+                        if (set_meta(shout, SHOUT_META_DESCRIPTION, optarg, false) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting description: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
                     case FLAG_STATION_GENRE:
-                        if (shout_set_meta(shout, SHOUT_META_GENRE, optarg) != SHOUTERR_SUCCESS) {
+                        if (set_meta(shout, SHOUT_META_GENRE, optarg, false) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting genre: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
                     case FLAG_STATION_NAME:
-                        if (shout_set_meta(shout, SHOUT_META_NAME, optarg) != SHOUTERR_SUCCESS) {
+                        if (set_meta(shout, SHOUT_META_NAME, optarg, false) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting name: %s\n", shout_get_error(shout));
                             return -1;
                         }
                         break;
                     case FLAG_STATION_URL:
-                        if (shout_set_meta(shout, SHOUT_META_URL, optarg) != SHOUTERR_SUCCESS) {
+                        if (set_meta(shout, SHOUT_META_URL, optarg, false) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting URL: %s\n", shout_get_error(shout));
                             return -1;
                         }
@@ -586,7 +606,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                         }
                         *pos = '\0'; /* terminate key */
 
-                        if (shout_set_meta(shout, optarg, pos + 1) != SHOUTERR_SUCCESS) {
+                        if (set_meta(shout, optarg, pos + 1, true) != SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting meta information: %s\n", shout_get_error(shout));
                             return -1;
                         }
