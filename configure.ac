@@ -248,4 +248,4 @@ AC_SUBST(XIPH_LIBS)
 AC_OUTPUT([Makefile include/Makefile include/shout/Makefile
   include/shout/shout.h src/Makefile src/common/net/Makefile src/common/timing/Makefile
   src/common/thread/Makefile src/common/avl/Makefile src/common/httpp/Makefile doc/Makefile
-  examples/Makefile win32/Makefile shout.pc])
+  tools/Makefile examples/Makefile win32/Makefile shout.pc])

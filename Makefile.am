@@ -3,7 +3,7 @@
 AUTOMAKE_OPTIONS = 1.6 foreign
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = include src doc win32
+SUBDIRS = include src doc win32 tools
 if HAVE_EXAMPLES
 SUBDIRS += examples
 endif
