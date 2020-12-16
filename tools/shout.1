@@ -20,21 +20,13 @@ reads data from standard input and streams it to Icecast.
 .Sh OPTIONS
 .\"
 .Bl -tag -width 4n
-.It Fl \-description Ar string
-Set stream description.
 .\"
 .It Fl \-format Ar format
 Set stream format. This can be "ogg", "mp3", or "webm". Default is "ogg".
 .\"
-.It Fl \-genre Ar string
-Set stream genre.
-.\"
 .It Fl H Ar host
 See
 .Fl \-host
-.\"
-.It Fl \-host Ar host
-Set destination host. Default is "localhost".
 .\"
 .It Fl h
 See
@@ -42,6 +34,9 @@ See
 .\"
 .It Fl \-help
 Show help.
+.\"
+.It Fl \-host Ar host
+Set destination host. Default is "localhost".
 .\" --meta
 .It Fl \-meta Ar key Ns No = Ns Ar value
 Set meta information. Both
@@ -53,32 +48,35 @@ are arbitrary strings.
 .It Fl \-mount Ar string
 Set mountpoint. Default is "/example.ogg".
 .\"
-.It Fl \-name Ar string
-Set stream name.
-.\"
 .It Fl P Ar port
 See
 .Fl \-port
 .\"
-.It Fl \-port Ar port
-Set destination port. Symbolic names are supported. Default is 8000.
-.\"
 .It Fl \-pass Ar string
 Set source password. Default is "hackme".
 .\"
+.It Fl \-port Ar port
+Set destination port. Symbolic names are supported. Default is 8000.
+.\"
 .It Fl \-proto Ar protocol
 Set protocol. Default is "http".
+.\" STATION METADATA
+.It Fl \-station-description Ar string
+Set stream description.
 .\"
-.It Fl \-user Ar string
-Set source user. Default is "source".
+.It Fl \-station-genre Ar string
+Set stream genre.
+.\"
+.It Fl \-station-name Ar string
+Set stream name.
+.\"
+.It Fl \-station-url Ar string
+Set stream URL.
 .\"
 .It Fl \-tls-mode Ar tls-mode
 Set TLS mode. This can be "disabled", "auto", "auto_no_plain", "rfc2818", or "rfc2817". Default is "auto".
 
 When libshout is build without TLS support only "disabled", and "auto" are supported.
-.\"
-.It Fl \-url Ar string
-Set stream URL.
 .\"
 .It Fl \-usage Ar usage{,usage}
 Set stream usages. This can be:
@@ -112,6 +110,9 @@ for streams that contain information for 3D playback
 .It Qq 4d
 for streams that contain information for 4D/XD playback
 .El
+.\"
+.It Fl \-user Ar string
+Set source user. Default is "source".
 .\"
 .El
 .\"
