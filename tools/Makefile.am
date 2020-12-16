@@ -1,9 +1,9 @@
 AUTOMAKE_OPTIONS = foreign
 
-bin_PROGRAMS = shoutout
+bin_PROGRAMS = shout
 AM_CFLAGS = @XIPH_CFLAGS@ -I$(top_builddir)/include -Wall -Wextra
 
 man1_MANS = shout.1
 
-shoutout_SOURCES = shoutout.c
-shoutout_LDADD = $(top_builddir)/src/libshout.la
+shout_SOURCES = shout.c
+shout_LDADD = $(top_builddir)/src/libshout.la
