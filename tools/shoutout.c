@@ -38,6 +38,9 @@
 
 #include <shout/shout.h>
 
+#define DEFAULT_MOUNT           "/example.ogg"
+#define DEFAULT_PASSWORD        "hackme"
+
 /* only long options need a flag value */
 enum flag {
     FLAG__NONE                  = 0,
@@ -700,7 +703,7 @@ int main (int argc, char *argv[])
 
     /* mount is not set by shout_new */
     if (!shout_get_mount(shout)) {
-        if (shout_set_mount(shout, "/example.ogg") != SHOUTERR_SUCCESS) {
+        if (shout_set_mount(shout, DEFAULT_MOUNT) != SHOUTERR_SUCCESS) {
             fprintf(stderr, "Error setting mount: %s\n", shout_get_error(shout));
             return EXIT_FAILURE;
         }
@@ -708,7 +711,7 @@ int main (int argc, char *argv[])
 
     /* password is not set by shout_new */
     if (!shout_get_password(shout)) {
-        if (shout_set_password(shout, "hackme") != SHOUTERR_SUCCESS) {
+        if (shout_set_password(shout, DEFAULT_PASSWORD) != SHOUTERR_SUCCESS) {
             fprintf(stderr, "Error setting password: %s\n", shout_get_error(shout));
             return EXIT_FAILURE;
         }
