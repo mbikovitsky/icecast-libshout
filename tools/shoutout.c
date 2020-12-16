@@ -167,6 +167,13 @@ static inline int string2port(const char *name, int *res)
     }
 }
 
+int set_mount(shout_t *self, const char *mount)
+{
+    if (!mount || *mount != '/' || strlen(mount) < 2)
+        fprintf(stderr, "Warning: Mount point not starting with a slash (\"/\").\n");
+    return shout_set_mount(self, mount);
+}
+
 void usage_oggfwd(const char *progname)
 {
     fprintf(stderr,
@@ -426,7 +433,7 @@ static int getopts_oggfwd(int argc, char *argv[], shout_t *shout)
         return -1;
     }
 
-    if (shout_set_mount(shout, argv[optind++]) != SHOUTERR_SUCCESS) {
+    if (set_mount(shout, argv[optind++]) != SHOUTERR_SUCCESS) {
         fprintf(stderr, "Error setting mount: %s\n", shout_get_error(shout));
         return -1;
     }
@@ -509,7 +516,7 @@ static int getopts_shout(int argc, char *argv[], shout_t *shout)
                         }
                         break;
                     case FLAG_MOUNT:
-                        if (shout_set_mount(shout, optarg) !=
+                        if (set_mount(shout, optarg) !=
                                 SHOUTERR_SUCCESS) {
                             fprintf(stderr, "Error setting mount: %s\n",
                                     shout_get_error(shout));
@@ -703,7 +710,7 @@ int main (int argc, char *argv[])
 
     /* mount is not set by shout_new */
     if (!shout_get_mount(shout)) {
-        if (shout_set_mount(shout, DEFAULT_MOUNT) != SHOUTERR_SUCCESS) {
+        if (set_mount(shout, DEFAULT_MOUNT) != SHOUTERR_SUCCESS) {
             fprintf(stderr, "Error setting mount: %s\n", shout_get_error(shout));
             return EXIT_FAILURE;
         }
