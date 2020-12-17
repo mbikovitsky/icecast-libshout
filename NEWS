@@ -6,6 +6,7 @@ libshout 2.4.5 (202012??)
 * Several small fixes for non-blocking mode (#2321, #2315).
 * Corrected detection of libogg (mostly for windows targets).
 * Now accept TLS mode "auto" when build without TLS support.
+* Added new tool shout(1).
 
 libshout 2.4.4 (20201001)
 
