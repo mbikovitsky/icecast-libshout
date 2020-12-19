@@ -1,4 +1,5 @@
-libshout 2.4.5 (202012??)
+libshout 2.4.5 (20201219)
+
 * Improved shout.h for reading, and understanding.
 * Marked dumpfile support as obsolete (as SHOUT_PROTOCOL_XAUDIOCAST already is).
 * Added Support for setting the content language.
