@@ -126,7 +126,7 @@ fi
 
 PKG_CHECK_MODULES([OGG], [ogg], [
     HAVE_OGG="yes"
-    SHOUT_REQUIRES="$SHOUT_REQUIRES, ogg"
+    SHOUT_REQUIRES="ogg"
   ], [
     XIPH_PATH_OGG(, [AC_MSG_ERROR([required Ogg library not found])])
   ])
