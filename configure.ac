@@ -133,14 +133,24 @@ PKG_CHECK_MODULES([OGG], [ogg], [
 OGG_LIBS="$OGG_LDFLAGS $OGG_LIBS"
 XIPH_CFLAGS="$XIPH_CFLAGS $OGG_CFLAGS"
 
+AC_ARG_ENABLE([vorbis],
+  AS_HELP_STRING([--disable-vorbis],[do not build with Vorbis support]))
+
+if test "x$enable_vorbis" != "xno"; then
 PKG_CHECK_MODULES(VORBIS, vorbis, [
     HAVE_VORBIS="yes"
     SHOUT_REQUIRES="$SHOUT_REQUIRES, vorbis"
   ], [
-    XIPH_PATH_VORBIS(, [AC_MSG_ERROR([required Ogg Vorbis library not found])])
+    XIPH_PATH_VORBIS(, [AC_MSG_WARN([Vorbis library not found, disabling])])
   ])
-VORBIS_LIBS="$VORBIS_LDFLAGS $VORBIS_LIBS"
-XIPH_CFLAGS="$XIPH_CFLAGS $VORBIS_CFLAGS"
+fi
+XIPH_VAR_APPEND([XIPH_CPPFLAGS],[$VORBIS_CFLAGS])
+XIPH_VAR_PREPEND([XIPH_LIBS],[$VORBIS_LDFLAGS $VORBIS_LIBS])
+AM_CONDITIONAL([HAVE_VORBIS], [test -n "$VORBIS_LIBS"])
+if test -n "$VORBIS_LIBS"
+then
+  AC_DEFINE([HAVE_VORBIS], 1, [Define if you want Vorbis streams supported])
+fi
 
 AC_ARG_ENABLE([theora],
   AS_HELP_STRING([--disable-theora],[do not build with Theora support]))
